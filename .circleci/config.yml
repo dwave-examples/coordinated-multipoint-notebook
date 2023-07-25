@@ -1,0 +1,35 @@
+version: 2.1
+
+orbs:
+  dwave: dwave/orb-examples@2
+
+workflows:
+  version: 2.1
+  tests:
+    jobs:
+      - dwave/test-linux:
+          testing-framework: pytest
+      - dwave/test-osx:
+          testing-framework: pytest
+      - dwave/test-win:
+          testing-framework: pytest
+
+  weekly:
+    triggers:
+      - schedule:
+          cron: "0 7 * * 0"
+          filters:
+            branches:
+              only:
+                - master
+                - main
+    jobs:
+      - dwave/test-linux:
+          testing-framework: pytest
+          integration-tests: canary
+      - dwave/test-osx:
+          testing-framework: pytest
+          integration-tests: skip
+      - dwave/test-win:
+          testing-framework: pytest
+          integration-tests: skip
