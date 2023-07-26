@@ -1,1 +1,6 @@
 dwave-ocean-sdk>=6.4.0
+
+jupyter~=7.0.
+jupyter_contrib_nbextensions
+
+matplotlib~=3.7
