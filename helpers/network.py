@@ -14,7 +14,7 @@
 
 import matplotlib.pyplot as plt
 import networkx as nx
-
+import numpy as np
 import dwave_networkx as dnx
 
 
@@ -70,12 +70,13 @@ def create_lattice(lattice_size=16, target=None):
         Two tuple of embedding and the source lattice. 
     """
     if not target:
-        nodes_lattice_size = [dnx.pegasus_coordinates(16).nice_to_linear(node) for node in 
-            dnx.pegasus_graph(m=16, nice_coordinates=True).nodes 
+        nodes_lattice_size = [dnx.pegasus_coordinates(16).nice_to_linear(node) 
+            for node in dnx.pegasus_graph(m=16, nice_coordinates=True).nodes 
             if node[1]<lattice_size and node[2]<lattice_size]
         qpu_graph = dnx.pegasus_graph(m=16, node_list=nodes_lattice_size)	
         target = nx.relabel_nodes(qpu_graph, 
-            {n: dnx.pegasus_coordinates(16).linear_to_pegasus(n) for n in qpu_graph.nodes()})
+            {n: dnx.pegasus_coordinates(16).linear_to_pegasus(n) 
+                for n in qpu_graph.nodes()})
 
     scale = 3*(lattice_size - 1)
     emb = {}
@@ -99,7 +100,8 @@ def create_lattice(lattice_size=16, target=None):
                 for delta in [(0, -1), (-1, 0), (-1, -1), (-1, 1)]:
                     v_back = (row + delta[0], col + delta[1])
                     if source.has_node(v_back):
-                        if any(target.has_edge(v1, v2) for v1 in emb[v] for v2 in emb[v_back]):
+                        if any(target.has_edge(v1, v2) 
+                                for v1 in emb[v] for v2 in emb[v_back]):
                             source.add_edge(v, v_back)
                         else:
                             edge_defects += 1
@@ -110,8 +112,49 @@ def create_lattice(lattice_size=16, target=None):
             else:
                 node_defects += 1
          
-    props = dict(scale=scale, node_defects=node_defects, edge_defects=edge_defects, nodes=source.number_of_nodes(), edges=source.number_of_edges())
+    props = dict(scale=scale, 
+                    node_defects=node_defects, 
+                    edge_defects=edge_defects, 
+                    nodes=source.number_of_nodes(), 
+                    edges=source.number_of_edges())
 
     return emb, source, props
 
+def configure_network(source, ratio=1):
+    """Configure network transmitters and receivers.
 
+    Args:
+        source: Lattice graph as the base of the network.
+
+        dilution: TBD change to tx/rx ratio
+
+    Returns:
+        Two-tuple of transmission graph and Tx/Rx ratio. 
+    """		
+    transmission_graph = nx.Graph()
+    transmission_graph.add_nodes_from(source.nodes())
+    
+    nx.set_node_attributes(transmission_graph, 
+        values={n: 1 for n in transmission_graph.nodes()}, 
+        name='num_transmitters')
+    nx.set_node_attributes(transmission_graph, values=0, name='num_receivers')
+    
+    for n in list(transmission_graph.nodes()):
+
+        transmission_graph.add_nodes_from(((n[0]+x, n[1]+y) 
+            for x in [-0.5,0.5] for y in [-0.5,0.5]),
+            num_receivers=np.random.choice([1, 0], p=[ratio, 1-ratio]),
+            num_transmitters=0)
+        
+        transmission_graph.add_edges_from((n,(n[0]+x, n[1]+y)) 
+            for x in [-0.5,0.5] for y in [-0.5,0.5])
+
+    # nx.set_node_attributes(transmission_graph, values={n: 0 if n in variables else random.choice([*[1]*20, *[0]*dilution]) for n in transmission_graph.nodes()}, name='num_receivers')
+	
+    num_tx = sum(nx.get_node_attributes(transmission_graph, 
+        "num_transmitters").values())
+    num_rx = sum(nx.get_node_attributes(transmission_graph, 
+        "num_receivers").values())
+    tx_over_rx = num_tx/num_rx
+	
+    return transmission_graph, tx_over_rx
