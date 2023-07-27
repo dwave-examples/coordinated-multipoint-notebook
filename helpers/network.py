@@ -162,7 +162,10 @@ def print_network_stats(network):
     """Print statistics on the network graph.
 
     Args:
-        network: Network graph
+        network: Network graph.
+
+    Returns:
+        Two-tuple of the numbers of transmitters and receivers.
     """
 
     num_tx = sum(nx.get_node_attributes(network, 
@@ -175,3 +178,5 @@ def print_network_stats(network):
     print(f"Number of transmitters is {num_tx} and receivers is {num_rx}.")
     print(f"Total nodes in the network (occupied and unoccupied) is {len(network)}.")
     print(f"Number of edges is {len(network.edges)}.")
+
+    return num_tx, num_rx
