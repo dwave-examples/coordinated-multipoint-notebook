@@ -18,7 +18,7 @@ import numpy as np
 import dwave_networkx as dnx
 
 
-def node_to_chain(row, col): 
+def _node_to_chain(row, col): 
     """"Embed a node into a chain for a grid-with-diagonal lattice.
 
     Args:
@@ -60,7 +60,7 @@ def node_to_chain(row, col):
         elif col_par == 2:
             return (0, x+1, 4, y), (1, y, 10, x)
 
-def create_lattice(lattice_size=16, target=None):
+def _create_lattice(lattice_size=16, target=None):
     """Create a lattice with an embedding
 
     Args:
@@ -87,7 +87,7 @@ def create_lattice(lattice_size=16, target=None):
     for row in range(scale):
         for col in range(scale):
             v = (row, col)
-            edge = node_to_chain(row, col)
+            edge = _node_to_chain(row, col)
             sourceF.add_node(v)
             for delta in [(0, -1), (-1, 0), (-1, -1), (-1, 1)]:
                 v_back = (row + delta[0], col + delta[1])
@@ -120,17 +120,23 @@ def create_lattice(lattice_size=16, target=None):
 
     return emb, source, props
 
-def configure_network(source, ratio=1):
+
+def configure_network(lattice_size=16, target=None, ratio=1):
     """Configure network transmitters and receivers.
 
     Args:
-        source: Lattice graph as the base of the network.
+        lattice_size: Size of the underlying lattice.
+        
+        target: QPU.
 
-        dilution: TBD change to tx/rx ratio
+        ratio: TBD change to tx/rx ratio
 
     Returns:
-        Two-tuple of transmission graph and Tx/Rx ratio. 
+        Four-tuple of transmission graph, Tx/Rx ratio, embedding, stats. 
     """		
+
+    emb, source, props = _create_lattice(lattice_size=lattice_size, target=None)
+
     transmission_graph = nx.Graph()
     transmission_graph.add_nodes_from(source.nodes())
     
@@ -157,4 +163,4 @@ def configure_network(source, ratio=1):
         "num_receivers").values())
     tx_over_rx = num_tx/num_rx
 	
-    return transmission_graph, tx_over_rx
+    return transmission_graph, tx_over_rx, emb, props
