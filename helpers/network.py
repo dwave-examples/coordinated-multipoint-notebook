@@ -119,7 +119,7 @@ def configure_network(lattice_size=16, target=None, ratio=1):
 
     Args:
         lattice_size: Size of the underlying lattice. Supported values are 
-            integers between 3 to 16. 
+            integers between 4 to 16. 
         
         target: QPU to which the graph must be made compatible.
 
@@ -128,7 +128,7 @@ def configure_network(lattice_size=16, target=None, ratio=1):
     Returns:
         Four-tuple of transmission graph, Tx/Rx ratio, embedding, stats. 
     """
-    if lattice_size not in list(range(3, 17)):
+    if lattice_size not in list(range(4, 17)):
         raise ValueError("Supported lattice sizes are between 3 to 16")		
 
     emb, source = _create_lattice(lattice_size=lattice_size, target=None)
