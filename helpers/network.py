@@ -111,56 +111,67 @@ def _create_lattice(lattice_size=16, target=None):
                         pass
             else:
                 node_defects += 1
-         
-    props = dict(scale=scale, 
-                    node_defects=node_defects, 
-                    edge_defects=edge_defects, 
-                    nodes=source.number_of_nodes(), 
-                    edges=source.number_of_edges())
 
-    return emb, source, props
-
+    return emb, source
 
 def configure_network(lattice_size=16, target=None, ratio=1):
     """Configure network transmitters and receivers.
 
     Args:
-        lattice_size: Size of the underlying lattice.
+        lattice_size: Size of the underlying lattice. Supported values are 
+            integers between 3 to 16. 
         
-        target: QPU.
+        target: QPU to which the graph must be made compatible.
 
-        ratio: TBD change to tx/rx ratio
+        ratio: Desired Tx/Rx ratio.
 
     Returns:
         Four-tuple of transmission graph, Tx/Rx ratio, embedding, stats. 
-    """		
+    """
+    if lattice_size not in list(range(3, 17)):
+        raise ValueError("Supported lattice sizes are between 3 to 16")		
 
-    emb, source, props = _create_lattice(lattice_size=lattice_size, target=None)
+    emb, source = _create_lattice(lattice_size=lattice_size, target=None)
 
-    transmission_graph = nx.Graph()
-    transmission_graph.add_nodes_from(source.nodes())
+    network = nx.Graph()
+    network.add_nodes_from(source.nodes())
     
-    nx.set_node_attributes(transmission_graph, 
-        values={n: 1 for n in transmission_graph.nodes()}, 
+    nx.set_node_attributes(network, 
+        values={n: 1 for n in network.nodes()}, 
         name='num_transmitters')
-    nx.set_node_attributes(transmission_graph, values=0, name='num_receivers')
+    nx.set_node_attributes(network, values=0, name='num_receivers')
     
-    for n in list(transmission_graph.nodes()):
+    num_tx = len(network)
+    max_num_rx = len(set([(n[0]+x, n[1]+y) for n in network.nodes 
+        for x in [-0.5,0.5] for y in [-0.5,0.5]]))
+    dilution = num_tx/(max_num_rx * ratio)
 
-        transmission_graph.add_nodes_from(((n[0]+x, n[1]+y) 
+    for n in list(network.nodes()):
+
+        network.add_nodes_from(((n[0]+x, n[1]+y) 
             for x in [-0.5,0.5] for y in [-0.5,0.5]),
-            num_receivers=np.random.choice([1, 0], p=[ratio, 1-ratio]),
+            num_receivers=np.random.choice([1, 0], p=[dilution, 1-dilution]),
             num_transmitters=0)
         
-        transmission_graph.add_edges_from((n,(n[0]+x, n[1]+y)) 
+        network.add_edges_from((n,(n[0]+x, n[1]+y)) 
             for x in [-0.5,0.5] for y in [-0.5,0.5])
 
-    # nx.set_node_attributes(transmission_graph, values={n: 0 if n in variables else random.choice([*[1]*20, *[0]*dilution]) for n in transmission_graph.nodes()}, name='num_receivers')
-	
-    num_tx = sum(nx.get_node_attributes(transmission_graph, 
+    return network, emb
+
+def print_network_stats(network):
+    """Print statistics on the network graph.
+
+    Args:
+        network: Network graph
+    """
+
+    num_tx = sum(nx.get_node_attributes(network, 
         "num_transmitters").values())
-    num_rx = sum(nx.get_node_attributes(transmission_graph, 
+    num_rx = sum(nx.get_node_attributes(network, 
         "num_receivers").values())
     tx_over_rx = num_tx/num_rx
 	
-    return transmission_graph, tx_over_rx, emb, props
+    print(f"Ratio of transmitters to receivers: {round(tx_over_rx, 2)}.")
+    print(f"Number of transmitters is {num_tx} and receivers is {num_rx}.")
+    print(f"Total nodes in the network (occupied and unoccupied) is {len(network)}.")
+    print(f"Number of edges is {len(network.edges)}.")
