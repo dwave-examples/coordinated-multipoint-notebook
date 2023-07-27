@@ -60,7 +60,7 @@ def node_to_chain(row, col):
         elif col_par == 2:
             return (0, x+1, 4, y), (1, y, 10, x)
 
-def create_lattice(lattice_size=16):
+def create_lattice(lattice_size=16, target=None):
     """Create a lattice with an embedding
 
     Args:
@@ -69,6 +69,14 @@ def create_lattice(lattice_size=16):
     Returns:
         Two tuple of embedding and the source lattice. 
     """
+    if not target:
+        nodes_lattice_size = [dnx.pegasus_coordinates(16).nice_to_linear(node) for node in 
+            dnx.pegasus_graph(m=16, nice_coordinates=True).nodes 
+            if node[1]<lattice_size and node[2]<lattice_size]
+        qpu_graph = dnx.pegasus_graph(m=16, node_list=nodes_lattice_size)	
+        target = nx.relabel_nodes(qpu_graph, 
+            {n: dnx.pegasus_coordinates(16).linear_to_pegasus(n) for n in qpu_graph.nodes()})
+
     scale = 3*(lattice_size - 1)
     emb = {}
     source = nx.Graph()
