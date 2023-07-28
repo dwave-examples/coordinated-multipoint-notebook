@@ -136,7 +136,7 @@ def configure_network(lattice_size=16, qpu=None, ratio=1):
         Four-tuple of transmission graph, Tx/Rx ratio, embedding, stats. 
     """
     if lattice_size not in list(range(4, 17)):
-        raise ValueError("Supported lattice sizes are between 3 to 16")		
+        raise ValueError("Supported lattice sizes are between 4 to 16")		
 
     emb, source = _create_lattice(lattice_size=lattice_size, qpu=qpu)
 
@@ -162,6 +162,10 @@ def configure_network(lattice_size=16, qpu=None, ratio=1):
         
         network.add_edges_from((n,(n[0]+x, n[1]+y)) 
             for x in [-0.5,0.5] for y in [-0.5,0.5])
+
+    emb = {idx: [dnx.pegasus_coordinates(16).pegasus_to_linear(n[0]), 
+                dnx.pegasus_coordinates(16).pegasus_to_linear(n[1])] for 
+                idx, (tx, n) in enumerate(emb.items())}
 
     return network, emb
 
