@@ -56,15 +56,25 @@ def apply_filters(signal, filters):
 def compare_signals(v, transmission):
     """
     """
-    success_rate = {filter: sum(v[filter].flatten() == transmission.flatten()) 
-        for filter in v.keys()}
-    success_rate = {name: round(100*val/len(transmission)) for 
-        name, val in success_rate.items()}
-       
+    if isinstance(v, dict):
+        success_rate = {filter: sum(v[filter].flatten() == transmission.flatten()) 
+            for filter in v.keys()}
+        success_rate = {name: round(100*val/len(transmission)) for 
+            name, val in success_rate.items()}
 
-    for name in success_rate.keys():
-        print(f"{name}: decoded with a success rate of {success_rate[name]}%.")
-
+        for name in success_rate.keys():
+            print(f"{name}: decoded with a success rate of {success_rate[name]}%.")
+    else:
+        if isinstance(v, dimod.SampleSet):
+            received = np.array(list(v.first.sample.values()))
+        elif isinstance(v, np.ndarray):
+            received = v.flatten()
+        else:
+            raise ValueError("Unknown signal type")
+        
+        sr = round(100*sum(received == transmission.flatten())/len(transmission))
+        print(f"Decoded with a success rate of {sr}%.")
+    
 def time_filter_instantiation(network_size, methods=None):
     """
     """

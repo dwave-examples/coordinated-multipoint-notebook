@@ -193,14 +193,18 @@ def print_network_stats(network):
     print(f"Total nodes in the network (occupied and unoccupied) is {len(network)}.")
     print(f"Number of edges is {len(network.edges)}.")
 
-    return num_tx, num_rx
-
-def create_channels(network, F_distribution=("binary", "real")):
+def create_channels(network, 
+    F_distribution=("binary", "real"), 
+    attenuation_matrix=None):
     """
     """
     num_tx, num_rx = num_tx_rx(network)
+    am = dimod.generators.mimo.lattice_to_attenuation_matrix(network)[0]
 
-    return dimod.generators.mimo.create_channel(num_receivers=num_rx, num_transmitters=num_tx, F_distribution=("binary", "real"))[0]
+    return dimod.generators.mimo.create_channel(num_receivers=num_rx, 
+        num_transmitters=num_tx, 
+        F_distribution=("binary", "real"),
+        attenuation_matrix=am)[0]
 
 def simulate_signals(channels, transmitted_symbols=None):
     """
