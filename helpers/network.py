@@ -15,8 +15,14 @@
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
+import dimod
 import dwave_networkx as dnx
 
+
+def num_tx_rx(network):
+    num_tx = sum(nx.get_node_attributes(network, "num_transmitters").values())
+    num_rx = sum(nx.get_node_attributes(network, "num_receivers").values())
+    return num_tx, num_rx
 
 def _node_to_chain(row, col): 
     """"Embed a node into a chain for a grid-with-diagonal lattice.
@@ -179,10 +185,7 @@ def print_network_stats(network):
         Two-tuple of the numbers of transmitters and receivers.
     """
 
-    num_tx = sum(nx.get_node_attributes(network, 
-        "num_transmitters").values())
-    num_rx = sum(nx.get_node_attributes(network, 
-        "num_receivers").values())
+    num_tx, num_rx = num_tx_rx(network) 
     tx_over_rx = num_tx/num_rx
 	
     print(f"Ratio of transmitters to receivers: {round(tx_over_rx, 2)}.")
@@ -191,3 +194,21 @@ def print_network_stats(network):
     print(f"Number of edges is {len(network.edges)}.")
 
     return num_tx, num_rx
+
+def create_channels(network, F_distribution=("binary", "real")):
+    """
+    """
+    num_tx, num_rx = num_tx_rx(network)
+
+    return dimod.generators.mimo.create_channel(num_receivers=num_rx, num_transmitters=num_tx, F_distribution=("binary", "real"))[0]
+
+def simulate_signals(channels, transmitted_symbols=None):
+    """
+    """
+    if not transmitted_symbols:
+        num_tx = channels.shape[1]
+        transmitted_symbols = np.random.choice([1, -1], size=[num_tx, 1]) 
+
+    y, v, _, _ = dimod.generators.mimo._create_signal(channels, transmitted_symbols=transmitted_symbols)
+
+    return y, v
