@@ -60,7 +60,7 @@ def _node_to_chain(row, col):
         elif col_par == 2:
             return (0, x+1, 4, y), (1, y, 10, x)
 
-def _create_lattice(lattice_size=16, target=None):
+def _create_lattice(lattice_size=16, qpu=None):
     """Create a lattice with an embedding
 
     Args:
@@ -69,14 +69,21 @@ def _create_lattice(lattice_size=16, target=None):
     Returns:
         Two tuple of embedding and the source lattice. 
     """
-    if not target:
-        nodes_lattice_size = [dnx.pegasus_coordinates(16).nice_to_linear(node) 
-            for node in dnx.pegasus_graph(m=16, nice_coordinates=True).nodes 
-            if node[1]<lattice_size and node[2]<lattice_size]
-        qpu_graph = dnx.pegasus_graph(m=16, node_list=nodes_lattice_size)	
-        target = nx.relabel_nodes(qpu_graph, 
-            {n: dnx.pegasus_coordinates(16).linear_to_pegasus(n) 
-                for n in qpu_graph.nodes()})
+    p16_graph = dnx.pegasus_graph(m=16, nice_coordinates=True)
+    node_list = [dnx.pegasus_coordinates(16).nice_to_linear(node) 
+        for node in p16_graph.nodes if 
+        node[1]<lattice_size and node[2]<lattice_size]
+    edge_list = None
+
+    if qpu:
+        node_list = list(set(node_list) & set(qpu.nodelist))
+        edge_list = qpu.edgelist
+        
+    qpu_graph = dnx.pegasus_graph(m=16, node_list=node_list, edge_list = edge_list)
+
+    target = nx.relabel_nodes(qpu_graph, 
+        {n: dnx.pegasus_coordinates(16).linear_to_pegasus(n) 
+        for n in qpu_graph.nodes()})
 
     scale = 3*(lattice_size - 1)
     emb = {}
@@ -114,14 +121,14 @@ def _create_lattice(lattice_size=16, target=None):
 
     return emb, source
 
-def configure_network(lattice_size=16, target=None, ratio=1):
+def configure_network(lattice_size=16, qpu=None, ratio=1):
     """Configure network transmitters and receivers.
 
     Args:
         lattice_size: Size of the underlying lattice. Supported values are 
             integers between 4 to 16. 
         
-        target: QPU to which the graph must be made compatible.
+        qpu: QPU to which the graph must be made compatible.
 
         ratio: Desired Tx/Rx ratio.
 
@@ -131,7 +138,7 @@ def configure_network(lattice_size=16, target=None, ratio=1):
     if lattice_size not in list(range(4, 17)):
         raise ValueError("Supported lattice sizes are between 3 to 16")		
 
-    emb, source = _create_lattice(lattice_size=lattice_size, target=None)
+    emb, source = _create_lattice(lattice_size=lattice_size, qpu=qpu)
 
     network = nx.Graph()
     network.add_nodes_from(source.nodes())
