@@ -84,7 +84,7 @@ def time_filter_instantiation(network_size, methods=None):
     for lattice_size in network_size:
 
         network, _ = configure_network(lattice_size=lattice_size)
-        channels = create_channels(network)
+        channels, cp = create_channels(network)
 
         num_tx, num_rx = num_tx_rx(network)
         print(f"\nFor a network of {num_tx} cellphones and {num_rx} base stations:\n")

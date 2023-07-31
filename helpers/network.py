@@ -204,15 +204,18 @@ def create_channels(network,
     return dimod.generators.mimo.create_channel(num_receivers=num_rx, 
         num_transmitters=num_tx, 
         F_distribution=("binary", "real"),
-        attenuation_matrix=am)[0]
+        attenuation_matrix=am)
 
-def simulate_signals(channels, transmitted_symbols=None):
+def simulate_signals(channels, channel_power, transmitted_symbols=None, SNRb=float('Inf')):
     """
     """
     if not transmitted_symbols:
         num_tx = channels.shape[1]
         transmitted_symbols = np.random.choice([1, -1], size=[num_tx, 1]) 
 
-    y, v, _, _ = dimod.generators.mimo._create_signal(channels, transmitted_symbols=transmitted_symbols)
+    y, v, _, _ = dimod.generators.mimo._create_signal(channels, 
+        transmitted_symbols=transmitted_symbols,
+        channel_power=channel_power,
+        SNRb=SNRb)
 
     return y, v
