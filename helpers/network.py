@@ -15,6 +15,8 @@
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
+import random
+
 import dimod
 import dwave_networkx as dnx
 
@@ -134,14 +136,14 @@ def configure_network(lattice_size=16, qpu=None, ratio=1):
         lattice_size: Size of the underlying lattice. Supported values are 
             integers between 4 to 16. 
         
-        qpu: QPU to which the graph must be made compatible.
+        qpu: QPU to which the graph must be compatible.
 
-        ratio: Desired Tx/Rx ratio.
+        ratio: Required Tx/Rx ratio.
 
     Returns:
-        Four-tuple of transmission graph, Tx/Rx ratio, embedding, stats. 
+        Two-tuple of network graph and minor-embedding. 
     """
-    if lattice_size not in list(range(4, 17)):
+    if lattice_size not in list(range(2, 17)):
         raise ValueError("Supported lattice sizes are between 4 to 16")		
 
     emb, source = _create_lattice(lattice_size=lattice_size, qpu=qpu)
@@ -149,26 +151,49 @@ def configure_network(lattice_size=16, qpu=None, ratio=1):
     network = nx.Graph()
     network.add_nodes_from(source.nodes())
     
-    nx.set_node_attributes(network, 
-        values={n: 1 for n in network.nodes()}, 
-        name='num_transmitters')
+    nx.set_node_attributes(network, values=1,  name='num_transmitters')
     nx.set_node_attributes(network, values=0, name='num_receivers')
-    
-    num_tx = len(network)
-    max_num_rx = len(set([(n[0]+x, n[1]+y) for n in network.nodes 
-        for x in [-0.5,0.5] for y in [-0.5,0.5]]))
-    dilution = num_tx/(max_num_rx * ratio)
 
+    # Add receiver nodes 
     for n in list(network.nodes()):
-
-        network.add_nodes_from(((n[0]+x, n[1]+y) 
-            for x in [-0.5,0.5] for y in [-0.5,0.5]),
-            num_receivers=np.random.choice([1, 0], p=[dilution, 1-dilution]),
+        network.add_nodes_from(((n[0]+x, n[1]+y) for x in [-0.5,0.5] for y in [-0.5,0.5]),
+            num_receivers=1,
             num_transmitters=0)
         
         network.add_edges_from((n,(n[0]+x, n[1]+y)) 
             for x in [-0.5,0.5] for y in [-0.5,0.5])
 
+    # Remove boundary receivers
+    left_bound = min(network.nodes())[0] 
+    top_bound = max(network.nodes())[0]  
+    for n in network.nodes():
+        if n[0] == left_bound or n[0] == top_bound or n[1] == left_bound or n[1] == top_bound:
+            network.nodes[n]['num_receivers'] = 0
+
+    # Dilute receivers to about requested Tx/Rx ratio
+    rx_nodes = [n for n, v in nx.get_node_attributes(network, "num_receivers").items() if v==1]
+    tx_nodes = [n for n, v in nx.get_node_attributes(network, "num_transmitters").items() if v==1]
+    num_tx = len(tx_nodes)
+    num_rx = len(rx_nodes)   
+    num_rx_to_delete = int(num_rx - num_tx/ratio) 
+    while num_rx_to_delete > 0.02*num_tx:
+        adj_tx_adj_rx = {rx: sum(sum(network.nodes[n]['num_receivers'] for n in network.adj[tx]) 
+            for tx in [tx for tx in network.adj[rx].keys()]) 
+                for rx in rx_nodes}
+        rx_max_adj_rx = [rx for rx, v in adj_tx_adj_rx.items() if v == max(adj_tx_adj_rx.values())]
+        rx_to_delete = random.sample(rx_max_adj_rx, min(len(rx_max_adj_rx), int(0.02*num_tx)))
+        nx.set_node_attributes(network.subgraph(rx_to_delete), values=0, name='num_receivers')         
+        rx_nodes = [n for n, v in nx.get_node_attributes(network, "num_receivers").items() if v==1]
+        num_rx_to_delete = int(len(rx_nodes) - num_tx/ratio)
+        
+    # Prevent disconnected transmitters 
+    for tx in tx_nodes:
+        num_rx_neighbors = sum(network.nodes[n]['num_receivers'] for n in network.adj[tx])
+        if num_rx_neighbors == 0:
+            candidates = [n for n in network.adj[tx] if network.nodes[n]['num_receivers'] == 0]
+            add_rx = candidates[np.random.randint(0, len(candidates))]
+            network.nodes[add_rx]['num_receivers'] = 1
+    
     emb = {idx: [dnx.pegasus_coordinates(16).pegasus_to_linear(n[0]), 
                 dnx.pegasus_coordinates(16).pegasus_to_linear(n[1])] for 
                 idx, (tx, n) in enumerate(emb.items())}
