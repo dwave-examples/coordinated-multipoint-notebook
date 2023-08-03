@@ -53,7 +53,7 @@ def apply_filters(signal, filters):
    
     return {name: apply_filter(filter, signal) for name, filter in filters.items()}
 
-def compare_signals(v, transmission):
+def compare_signals(v, transmission, silent_return=False):
     """
     """
     if isinstance(v, dict):
@@ -62,8 +62,11 @@ def compare_signals(v, transmission):
         success_rate = {name: round(100*val/len(transmission)) for 
             name, val in success_rate.items()}
 
-        for name in success_rate.keys():
-            print(f"{name}: decoded with a success rate of {success_rate[name]}%.")
+        if not silent_return:
+            for name in success_rate.keys():
+                print(f"{name}: decoded with a success rate of {success_rate[name]}%.")
+        else:
+            return success_rate
     else:
         if isinstance(v, dimod.SampleSet):
             received = np.array(list(v.first.sample.values()))
@@ -73,7 +76,10 @@ def compare_signals(v, transmission):
             raise ValueError("Unknown signal type")
         
         sr = round(100*sum(received == transmission.flatten())/len(transmission))
-        print(f"Decoded with a success rate of {sr}%.")
+        if not silent_return:
+            print(f"Decoded with a success rate of {sr}%.")
+        else:
+            return sr
     
 def time_filter_instantiation(network_size, methods=None):
     """
@@ -93,4 +99,7 @@ def time_filter_instantiation(network_size, methods=None):
             start_t = time.time_ns()
             create_filter(channels, method=method)
             time_ms = (time.time_ns() - start_t)/1000000
-            print(f"\t* {method} took about {round(time_ms)} milliseconds.")
+            if time_ms < 500:
+                print(f"\t* {method} took about {round(time_ms)} milliseconds.")
+            else:
+                print(f"\t* {method} took about \x1b[31m {round(time_ms)} \x1b[0m  milliseconds.")

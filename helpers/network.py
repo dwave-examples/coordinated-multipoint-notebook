@@ -129,7 +129,7 @@ def _create_lattice(lattice_size=16, qpu=None):
 
     return emb, source
 
-def configure_network(lattice_size=16, qpu=None, ratio=1):
+def configure_network(lattice_size=16, qpu=None, ratio=1.4):
     """Configure network transmitters and receivers.
 
     Args:
@@ -214,9 +214,8 @@ def print_network_stats(network):
     tx_over_rx = num_tx/num_rx
 	
     print(f"Ratio of transmitters to receivers: {round(tx_over_rx, 2)}.")
-    print(f"Number of transmitters is {num_tx} and receivers is {num_rx}.")
-    print(f"Total nodes in the network (occupied and unoccupied) is {len(network)}.")
-    print(f"Number of edges is {len(network.edges)}.")
+    print(f"Network has {num_tx} transmitters and {num_rx} receivers", 
+          f"with {len(network.edges)} edges.")
 
 def create_channels(network, 
     F_distribution=("binary", "real"), 

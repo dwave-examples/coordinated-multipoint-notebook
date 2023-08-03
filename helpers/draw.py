@@ -25,3 +25,12 @@ def draw_network(network):
         node_color = ['r' if tx[n] else 'g' if rx[n] else 'w' for n in network.nodes()], 
         with_labels=False, node_size=50)
     plt.show()
+
+def draw_loop_comparison(results, lattice_size=16, ratio=1.5, SNR=5):
+    fig = plt.figure(figsize=(8, 3))
+    for key in results:
+        plt.plot(results[key], "*-", label=key, markersize=5)
+        plt.xlabel="Run"
+        plt.ylabel="Success Rate [%]"
+        plt.suptitle(f"Network size={lattice_size}, Tx/Rx$\\approx${ratio}, SNRb={SNR}")
+    plt.show()
