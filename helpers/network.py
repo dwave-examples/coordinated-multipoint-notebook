@@ -129,7 +129,7 @@ def _create_lattice(lattice_size=16, qpu=None):
 
     return emb, source
 
-def configure_network(lattice_size=16, qpu=None, ratio=1.4):
+def configure_network(lattice_size=16, qpu=None, ratio=1.5):
     """Configure network transmitters and receivers.
 
     Args:

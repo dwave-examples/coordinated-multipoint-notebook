@@ -30,7 +30,9 @@ def draw_loop_comparison(results, lattice_size=16, ratio=1.5, SNR=5):
     fig = plt.figure(figsize=(8, 3))
     for key in results:
         plt.plot(results[key], "*-", label=key, markersize=5)
-        plt.xlabel="Run"
-        plt.ylabel="Success Rate [%]"
-        plt.suptitle(f"Network size={lattice_size}, Tx/Rx$\\approx${ratio}, SNRb={SNR}")
+    plt.xlabel("Run")
+    plt.ylabel("Success Rate [%]")
+    plt.legend()
+    plt.xticks(range(len(results[key])))    # All results are the same length (runs)
+    plt.suptitle(f"Network size={lattice_size}, Tx/Rx$\\approx${ratio}, SNRb={SNR}")
     plt.show()
