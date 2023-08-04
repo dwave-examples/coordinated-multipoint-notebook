@@ -32,17 +32,6 @@ Alternatively, install requirements locally (ideally, in a virtual environment):
 
 ## Usage
 
-To enable notebook extensions[^1]:
-
-```bash
-jupyter contrib nbextension install --sys-prefix
-jupyter nbextension enable toc2/main
-jupyter nbextension enable exercise/main
-jupyter nbextension enable exercise2/main
-jupyter nbextension enable python-markdown/main
-
-```
-
 To run the notebook:
 
 ```bash
