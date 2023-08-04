@@ -2,7 +2,7 @@
   https://cdn-assets.cloud.dwavesys.com/shared/latest/badges/leapide.svg)](
   https://ide.dwavesys.io/#https://github.com/dwave-examples/cooperative-multipoint)
 
-# Coordinated Multipoint
+# Decoding Cellphone Signals
 
 In radio networks, such as those used by cellphones, 
 [MIMO](https://en.wikipedia.org/wiki/MIMO) is a method of increasing link 
@@ -15,11 +15,11 @@ received signals.
 
 Such techniques enable network providers to increase and improve their cellphone
 service, especially in dense urban areas. However, such techniques demand 
-processing capabilities that can scale steeply with network size. 
+processing capacity that can increase steeply with network size. 
 
-This notebook demonstrates the use of quantum computer in decoding signals 
-transmitted in a model CoMP problem and compares performance to other decoding
-methods in use by cellular networks. 
+This notebook demonstrates the use of quantum computer in decoding transmissions 
+in CoMP problems and compares performance to other decoding
+methods in use by contemporary cellular networks. 
 
 ## Installation
 
