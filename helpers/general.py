@@ -16,7 +16,7 @@ import numpy as np
 import dimod
 
 from helpers.filters import ALL_METHODS, apply_filters, compare_signals, create_filters
-from dwave.samplers import SimulatedAnnealingSampler
+from dwave.samplers import SimulatedAnnealingSampler, SteepestDescentSampler, TabuSampler
 from dwave.system import FixedEmbeddingComposite
 from helpers.network import configure_network, create_channels, print_network_stats, simulate_signals
 
@@ -28,13 +28,16 @@ def loop_comparisons(qpu, runs=5, problem_size=16, snr=5, ratio=1.5, solvers=["m
         raise ValueError(f"Minimum supported runs is 3; got {runs}.")
 
     network, embedding = configure_network(
-        lattice_size=problem_size, 
+        network_size=problem_size, 
         ratio=ratio, qpu=qpu)
     print_network_stats(network)
 
     sampler_qpu = FixedEmbeddingComposite(qpu, embedding)
-    sampler_sa = SimulatedAnnealingSampler()
 
+    sampler_sa = SimulatedAnnealingSampler()
+    sampler_sd = SteepestDescentSampler()
+    sampler_tabu = TabuSampler()
+      
     SNR=snr
 
     results = {'QPU': []}
@@ -70,9 +73,18 @@ def loop_comparisons(qpu, runs=5, problem_size=16, snr=5, ratio=1.5, solvers=["m
         for filter in methods:
             results[filter].append(filter_results[f'filter_{filter}'])
 
+        # The next lines can be automated but the gain is not worth the complication
         if 'SA' in solvers:
             sampleset_sa = sampler_sa.sample(bqm, num_reads=1, num_sweeps=150)
             results['SA'].append(round(100*sum(np.array(list(sampleset_sa.first.sample.values())) == transmitted_symbols.flatten())/len(transmitted_symbols)))
+
+        if 'greedy' in solvers:
+            sampleset_sd = sampler_sd.sample(bqm, num_reads=1)
+            results['greedy'].append(round(100*sum(np.array(list(sampleset_sd.first.sample.values())) == transmitted_symbols.flatten())/len(transmitted_symbols)))
+
+        if 'tabu' in solvers:
+            sampleset_tabu = sampler_tabu.sample(bqm, num_reads=1, timeout=30)
+            results['tabu'].append(round(100*sum(np.array(list(sampleset_tabu.first.sample.values())) == transmitted_symbols.flatten())/len(transmitted_symbols)))
 
     print("\n")
 
