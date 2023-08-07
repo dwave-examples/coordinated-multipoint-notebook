@@ -89,7 +89,7 @@ def time_filter_instantiation(network_size, methods=None):
 
     for lattice_size in network_size:
 
-        network, _ = configure_network(lattice_size=lattice_size)
+        network, _ = configure_network(network_size=lattice_size)
         channels, cp = create_channels(network)
 
         num_tx, num_rx = num_tx_rx(network)
