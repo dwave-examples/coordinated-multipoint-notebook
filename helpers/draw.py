@@ -18,6 +18,11 @@ import numpy as np
 import dwave_networkx as dnx
 
 def draw_network(network):
+    """Plot the given network.
+
+    Args:
+        network: Network graph.
+    """
     fig = plt.figure(figsize=(8, 3))
     tx = nx.get_node_attributes(network, 'num_transmitters')
     rx = nx.get_node_attributes(network, 'num_receivers')
@@ -27,6 +32,17 @@ def draw_network(network):
     plt.show()
 
 def draw_loop_comparison(results, lattice_size=16, ratio=1.5, SNR=5):
+    """Plot results of decoding comparisons.
+
+    Args:
+        results: results returned from other helper functions.
+
+        lattice_size: Size of the network's underlying lattice.
+
+        ratio: Ratio of transmitters to receivers.
+
+        SNR: Signal-to-noise ratio.
+    """
     fig = plt.figure(figsize=(8, 3))
     for key in results:
         plt.plot(results[key], "*-", label=key, markersize=5)

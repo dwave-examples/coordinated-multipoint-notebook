@@ -21,7 +21,23 @@ from dwave.system import FixedEmbeddingComposite
 from helpers.network import configure_network, create_channels, print_network_stats, simulate_signals
 
 def loop_comparisons(qpu, runs=5, problem_size=16, snr=5, ratio=1.5, solvers=["matched_filter"]):
-    """
+    """Compare decoding between multiple algorithms.
+
+    Args:
+        qpu: Quantum computer.
+
+        runs: Number of problems to generate for comparisons.
+
+        problem_size: Size of the lattice underlying the network, 
+            given as :math:`3*(network_size - 1)`.
+
+        snr: Signal-to-noise ratio.
+
+        solvers: Algorithms used to decode the transmission. 
+
+    Returns:
+
+        Results of the comparisons, as a dict.
     """
 
     if runs < 3:

@@ -21,14 +21,42 @@ from helpers.network import configure_network, create_channels, num_tx_rx
 ALL_METHODS = ['zero_forcing', 'matched_filter', 'MMSE']
 
 def create_filter(channel_matrix, method, snr_over_nt=float('inf')):
-    """
+    """Instantiate a linear filter.
+
+    Args:
+        channel_matrix: Transmission channels.
+
+        method: Type of filter. Supported values are:
+
+            * 'matched_filter': Matched filter.
+            * 'MMSE': Minimum mean square error filter.
+            * 'zero_forcing': Zero forcing filter.
+
+        snr_over_nt: Signal-to-noise ratio.
+
+    Returns:
+        Instantiated filter.
     """
     if method not in ALL_METHODS:
         raise ValueError(f"filter {method} is not supported")
     return dimod.generators.mimo.linear_filter(channel_matrix, method=method, SNRoverNt=snr_over_nt)
 
 def create_filters(channels, methods=None, snr_over_nt=float('inf')):
-    """
+    """Instantiate linear filters.
+
+    Args:
+        channel_matrix: Transmission channels.
+
+        methods: Types of filter. Supported values are:
+
+            * 'matched_filter': Matched filter.
+            * 'MMSE': Minimum mean square error filter.
+            * 'zero_forcing': Zero forcing filter.
+
+        snr_over_nt: Signal-to-noise ratio.
+
+    Returns:
+        Instantiated filters.
     """
     if not methods:
         methods = ALL_METHODS
@@ -38,7 +66,15 @@ def create_filters(channels, methods=None, snr_over_nt=float('inf')):
         for method in methods}
 
 def apply_filter(filter, signal):
-    """
+    """Decode a transmission with the given filter.
+
+    Args:
+        filter: The linear filter used to decode the transmission.
+
+        signal: A received sequence of symbols, possibly noisy. 
+
+    Returns:
+        Decoded signal.
     """
     v = np.sign(np.real(np.matmul(filter, signal)))[:,0]
     
@@ -48,13 +84,31 @@ def apply_filter(filter, signal):
     return v
 
 def apply_filters(signal, filters):
-    """
+    """Decode a transmission with the given filters.
+
+    Args:
+        signal: A received sequence of symbols, possibly noisy.
+        
+        filter: Linear filters used to decode the transmission.
+
+    Returns:
+        Dict of signals decoded with each of the given filters.
     """
    
     return {name: apply_filter(filter, signal) for name, filter in filters.items()}
 
 def compare_signals(v, transmission, silent_return=False):
-    """
+    """Compare two sequences of transmission symbols.
+
+    Args:
+        v: A sequence of transmission symbols.
+
+        transmission: A sequence of transmission symbols.
+
+        silent_return: Boolean flag indicating whether to print results.
+
+    Returns:
+        Percentage of the sequence with identical symbols (returned if `silent_return=True`).  
     """
     if isinstance(v, dict):
         success_rate = {filter: sum(v[filter].flatten() == transmission.flatten()) 
@@ -82,7 +136,16 @@ def compare_signals(v, transmission, silent_return=False):
             return sr
     
 def time_filter_instantiation(network_size, methods=None):
-    """
+    """Measure the instantiation time of filters.
+
+    Args:
+        network_size: Size of the underlying lattice, :math:`3*(network_size - 1)`.
+
+        methods: Types of filter. Supported values are:
+
+            * 'matched_filter': Matched filter.
+            * 'MMSE': Minimum mean square error filter.
+            * 'zero_forcing': Zero forcing filter.
     """
     if not methods:
         methods = ALL_METHODS
