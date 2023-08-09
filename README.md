@@ -13,6 +13,8 @@ In one variation,
 neighboring cellular base stations jointly process received signals to reduce 
 transmission-decoding errors.
 
+PLACEHOLDER FOR GRAPHIC FROM MICHAEL
+
 High-quality decoding techniques are computationally expensive, especially in
 dense urban areas, characterized by high noise (low signal-to-noise ratios, SNR) 
 and load (large numbers of cellphones per base station). Consequently, network 
@@ -48,7 +50,7 @@ transmissions. Contemporary base stations use linear filters such as
 [Matched filter](https://en.wikipedia.org/wiki/Matched_filter) and 
 [minimum mean squared error (MMSE)](https://en.wikipedia.org/wiki/Minimum_mean_square_error). 
 However, these methods perform poorly in dense urban environments as the ratio 
-of cellphones to base stations and noise increase.[[1]](#1) Additionally, advanced 
+of cellphones to base stations and noise increase[[1]](#1). Additionally, advanced 
 decoding techniques improve throughput but demand computational resources that 
 grow exponentially with network size. Power consumption, therefore, is a problem.
 A quantum computer, in contrast, can provide powerful computational abilities 
@@ -63,12 +65,17 @@ which represents the wireless channels of transmission. That is,
 
 ![eq1](_static/eq_armin_y_minus_hv.png)
 
-And the objective function is given by:
+and the objective function is given by:
 
 ![eq2](_static/eq_e_full.png)
 
-[[2]](#2) formulates the transmission-decoding problem as an Ising model and 
-you can see Ocean software's implementation in 
+with the external summation on the receivers (e.g., base stations),
+the internal summations on the transmitters (e.g., cellphones), and 
+the Hermitian transpose denoted with the dagger symbol.  
+
+
+Reference [[2]](#2) below formulates the transmission-decoding problem as an 
+Ising model and you can see Ocean software's implementation in 
 [dimod](https://docs.ocean.dwavesys.com/en/stable/docs_dimod/sdk_index.html).
 
 In brief, in the case of BPSK handled by this example, symbols are 1 or -1, 
@@ -79,6 +86,8 @@ and you can reduce the objective to,
 The Ising model's coefficients are then given by,
 
 ![eq4](_static/eq_h_j.png)
+
+where superscript Q and I denote imaginary and real parts, respectively. 
 
 ### References
 
