@@ -4,22 +4,23 @@
 
 # Decoding Cellphone Signals
 
-In radio networks, such as those used by cellphones, 
-[MIMO](https://en.wikipedia.org/wiki/MIMO) is a method of increasing link 
-capacity by using multiple transmission and receiving antennas to exploit 
+In wireless networks, such as cellular and Wi-Fi networks, 
+[MIMO](https://en.wikipedia.org/wiki/MIMO) is an essential method of increasing 
+transmission capacity: it uses multiple antennas to exploit 
 [multipath propagation](https://en.wikipedia.org/wiki/Multipath_propagation). 
+In one variation, 
+[coordinated multipoint (CoMP)](https://en.wikipedia.org/wiki/Cooperative_MIMO),
+neighboring cellular base stations jointly process received signals to reduce 
+transmission-decoding errors.
 
-In [coordinated multipoint (CoMP)](https://en.wikipedia.org/wiki/Cooperative_MIMO)
-neighboring cellular base stations coordinate transmissions and jointly process 
-received signals.
+High-quality decoding techniques are computationally expensive, especially in
+dense urban areas, characterized by high noise (low signal-to-noise ratios, SNR) 
+and load (large numbers of cellphones per base station). Consequently, network 
+providers are in need of ways to reduce high operational cost and power demand. 
 
-Such techniques enable network providers to increase and improve their cellphone
-service, especially in dense urban areas. However, such techniques demand 
-processing capacity that can increase steeply with network size. 
-
-This notebook demonstrates the use of quantum computer in decoding transmissions 
-in CoMP problems and compares performance to other decoding
-methods in use by contemporary cellular networks. 
+This notebook demonstrates the use of a quantum computer in decoding transmissions 
+in CoMP problems and compares performance to decoding methods currently in use in 
+cellular networks. 
 
 ## Installation
 
@@ -44,36 +45,40 @@ jupyter notebook
 
 MIMO requires effective and efficient demultiplexing of mutually-interfering 
 transmissions. Contemporary base stations use linear filters such as 
-[zero forcing](https://en.wikipedia.org/wiki/Zero-forcing_precoding) and 
+[Matched filter](https://en.wikipedia.org/wiki/Matched_filter) and 
 [minimum mean squared error (MMSE)](https://en.wikipedia.org/wiki/Minimum_mean_square_error). 
-However, these methods perform poorly when the ratio of cellphones to base stations 
-increase.[[1]](#1) More advanced decoding techniques improve throughput but demand 
-computational resources that grow exponentially with network size.
+However, these methods perform poorly in dense urban environments as the ratio 
+of cellphones to base stations and noise increase.[[1]](#1) Additionally, advanced 
+decoding techniques improve throughput but demand computational resources that 
+grow exponentially with network size. Power consumption, therefore, is a problem.
+A quantum computer, in contrast, can provide powerful computational abilities 
+with low power needs. To solve the decoding problem with a quantum computer, 
+you formulate it as a 
+[binary quadratic model](https://docs.dwavesys.com/docs/latest/c_gs_workflow.html).  
 
-PLACEHOLDER TEXT:
+The decoding problem is to find a sequence of symbols, with the length of the 
+number of transmitters, that minimizes the difference between the received 
+signal and the sequence of symbols acted upon by the problem Hamiltonian, 
+which represents the wireless channels of transmission. That is,  
 
-The transmission received by a base station, comprising symbols sent in a
-single time period from all cellphones within range, is given by,
+![eq1](_static/eq_armin_y_minus_hv.png)
 
-![eq1](_static/eq_y_func_s_n.png)
+And the objective function is given by:
 
-where the left side is the received signal and the right side is the wireless
-channel acting on a vector of transmitted 
-[QAM](https://en.wikipedia.org/wiki/Quadrature_amplitude_modulation) signals plus
-a vector representing the channel's noise.
+![eq2](_static/eq_e_full.png)
 
-[[2]](#2) formulates the transmission-decoding problem as a QUBO and you can 
-see Ocean software's implementation in 
+[[2]](#2) formulates the transmission-decoding problem as an Ising model and 
+you can see Ocean software's implementation in 
 [dimod](https://docs.ocean.dwavesys.com/en/stable/docs_dimod/sdk_index.html).
 
-In brief, the decoding problem is represented as a maximum likelihood,
+In brief, in the case of BPSK handled by this example, symbols are 1 or -1, 
+and you can reduce the objective to,
 
-![eq2](_static/eq_max_likelihood.png)
+![eq3](_static/eq_e_quadratic.png)
 
-where for BPSK,
+The Ising model's coefficients are then given by,
 
-![eq3](_static/eq_bpsk_qubo.png)
-
+![eq4](_static/eq_h_j.png)
 
 ### References
 
