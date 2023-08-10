@@ -23,32 +23,60 @@ def draw_network(network):
     Args:
         network: Network graph.
     """
-    fig = plt.figure(figsize=(8, 3))
+    if len(network) < 1000:
+        fig = plt.figure(figsize=(8, 3))
+    else:
+        fig = plt.figure(figsize=(10, 10))
+
     tx = nx.get_node_attributes(network, 'num_transmitters')
     rx = nx.get_node_attributes(network, 'num_receivers')
+
     nx.draw_networkx(network, pos={n: n for n in network.nodes()}, 
         node_color = ['r' if tx[n] else 'g' if rx[n] else 'w' for n in network.nodes()], 
         with_labels=False, node_size=50)
     plt.show()
 
-def draw_loop_comparison(results, lattice_size=16, ratio=1.5, SNR=5):
+def draw_loop_comparison(results, network_size=16, ratio=1.5, SNRb=5):
     """Plot results of decoding comparisons.
 
     Args:
         results: results returned from other helper functions.
 
-        lattice_size: Size of the network's underlying lattice.
+        network_size: Size of the network's underlying lattice.
 
         ratio: Ratio of transmitters to receivers.
 
         SNR: Signal-to-noise ratio.
     """
     fig = plt.figure(figsize=(8, 3))
+
     for key in results:
         plt.plot(results[key], "*-", label=key, markersize=5)
+
     plt.xlabel("Run")
     plt.ylabel("Success Rate [%]")
     plt.legend()
     plt.xticks(range(len(results[key])))    # All results are the same length (runs)
-    plt.suptitle(f"Network size={lattice_size}, Tx/Rx$\\approx${ratio}, SNRb={SNR}")
+    plt.suptitle(f"Network size={network_size}, Tx/Rx$\\approx${ratio}, SNRb={SNRb}")
+    plt.show()
+
+def draw_instantiation_times(times, network_sizes):
+    """Plot results of decoding comparisons.
+
+    Args:
+        times: Instantiations times, as a dict.
+
+        network_sizes: Sizes of the underlying lattice.
+    """
+
+    fig = plt.figure(figsize=(8, 3))
+
+    for key in times:
+        plt.plot(times[key], "*-", label=key, markersize=5)
+
+    plt.xlabel("Network Size")
+    plt.ylabel("Instantiation Time [ms]")
+    plt.legend()
+    plt.xticks(range(len(times[key])), labels=network_sizes)    
+    plt.suptitle(f"Instantiation Times for Standard Linear Filters")
     plt.show()

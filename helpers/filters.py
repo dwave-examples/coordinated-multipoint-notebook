@@ -16,7 +16,8 @@ import numpy as np
 import time
 import dimod
 
-from helpers.network import configure_network, create_channels, num_tx_rx
+from helpers.network import configure_network, create_channels, _num_tx_rx
+from helpers.draw import draw_instantiation_times
 
 ALL_METHODS = ['zero_forcing', 'matched_filter', 'MMSE']
 
@@ -135,11 +136,11 @@ def compare_signals(v, transmission, silent_return=False):
         else:
             return sr
     
-def time_filter_instantiation(network_size, methods=None):
+def time_filter_instantiation(network_sizes, methods=None):
     """Measure the instantiation time of filters.
 
     Args:
-        network_size: Size of the underlying lattice, :math:`3*(network_size - 1)`.
+        network_sizes: Sizes of the underlying lattice, :math:`3*(network_size - 1)`.
 
         methods: Types of filter. Supported values are:
 
@@ -150,19 +151,23 @@ def time_filter_instantiation(network_size, methods=None):
     if not methods:
         methods = ALL_METHODS
 
-    for lattice_size in network_size:
+    times = {key: [] for key in methods}
+    for ns in network_sizes:
 
-        network, _ = configure_network(network_size=lattice_size)
-        channels, cp = create_channels(network)
+        network, _ = configure_network(network_size=ns)
+        channels, _ = create_channels(network)
 
-        num_tx, num_rx = num_tx_rx(network)
+        num_tx, num_rx = _num_tx_rx(network)
         print(f"\nFor a network of {num_tx} cellphones and {num_rx} base stations:\n")
 
         for method in methods:
             start_t = time.time_ns()
             create_filter(channels, method=method)
             time_ms = (time.time_ns() - start_t)/1000000
+            times[method].append(time_ms)
             if time_ms < 500:
                 print(f"\t* {method} took about {round(time_ms)} milliseconds.")
             else:
                 print(f"\t* {method} took about \x1b[31m {round(time_ms)} \x1b[0m  milliseconds.")
+
+    draw_instantiation_times(times, network_sizes)
