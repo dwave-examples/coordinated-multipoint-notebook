@@ -20,7 +20,7 @@ from dwave.samplers import SimulatedAnnealingSampler, SteepestDescentSampler, Ta
 from dwave.system import FixedEmbeddingComposite
 from helpers.network import configure_network, create_channels, print_network_stats, simulate_signals
 
-def loop_comparisons(qpu, runs=5, problem_size=16, snr=5, ratio=1.5, solvers=["matched_filter"]):
+def loop_comparisons(qpu, runs=5, network_size=16, snr=5, ratio=1.5, solvers=["matched_filter"]):
     """Compare decoding between multiple algorithms.
 
     Args:
@@ -28,7 +28,7 @@ def loop_comparisons(qpu, runs=5, problem_size=16, snr=5, ratio=1.5, solvers=["m
 
         runs: Number of problems to generate for comparisons.
 
-        problem_size: Size of the lattice underlying the network, 
+        network_size: Size of the lattice underlying the network, 
             given as :math:`3*(network_size - 1)`.
 
         snr: Signal-to-noise ratio.
@@ -44,7 +44,7 @@ def loop_comparisons(qpu, runs=5, problem_size=16, snr=5, ratio=1.5, solvers=["m
         raise ValueError(f"Minimum supported runs is 3; got {runs}.")
 
     network, embedding = configure_network(
-        network_size=problem_size, 
+        network_size=network_size, 
         ratio=ratio, qpu=qpu)
     print_network_stats(network)
 
@@ -67,7 +67,7 @@ def loop_comparisons(qpu, runs=5, problem_size=16, snr=5, ratio=1.5, solvers=["m
         channels, channel_power =  create_channels(network)
         y, transmitted_symbols = simulate_signals(channels, channel_power, SNRb=SNR)
 
-        methods = set(ALL_METHODS) & set(solvers)
+        methods = list(set(ALL_METHODS) & set(solvers))
         filters = create_filters(channels, methods=methods)
 
         bqm = dimod.generators.mimo.spin_encoded_comp(network, 

@@ -21,32 +21,11 @@ from helpers.draw import draw_instantiation_times
 
 ALL_METHODS = ['zero_forcing', 'matched_filter', 'MMSE']
 
-def create_filter(channel_matrix, method, snr_over_nt=float('inf')):
-    """Instantiate a linear filter.
-
-    Args:
-        channel_matrix: Transmission channels.
-
-        method: Type of filter. Supported values are:
-
-            * 'matched_filter': Matched filter.
-            * 'MMSE': Minimum mean square error filter.
-            * 'zero_forcing': Zero forcing filter.
-
-        snr_over_nt: Signal-to-noise ratio.
-
-    Returns:
-        Instantiated filter.
-    """
-    if method not in ALL_METHODS:
-        raise ValueError(f"filter {method} is not supported")
-    return dimod.generators.mimo.linear_filter(channel_matrix, method=method, SNRoverNt=snr_over_nt)
-
 def create_filters(channels, methods=None, snr_over_nt=float('inf')):
     """Instantiate linear filters.
 
     Args:
-        channel_matrix: Transmission channels.
+        channels: Transmission channels.
 
         methods: Types of filter. Supported values are:
 
@@ -61,42 +40,26 @@ def create_filters(channels, methods=None, snr_over_nt=float('inf')):
     """
     if not methods:
         methods = ALL_METHODS
-    return {f'filter_{method}': create_filter(channels, 
-            method=method, 
-            snr_over_nt=snr_over_nt) 
-        for method in methods}
-
-def apply_filter(filter, signal):
-    """Decode a transmission with the given filter.
-
-    Args:
-        filter: The linear filter used to decode the transmission.
-
-        signal: A received sequence of symbols, possibly noisy. 
-
-    Returns:
-        Decoded signal.
-    """
-    v = np.sign(np.real(np.matmul(filter, signal)))[:,0]
+    elif set(methods).difference(ALL_METHODS):
+        raise ValueError(f"filter {set(methods).difference(ALL_METHODS)} not supported")
     
-    # Randomly set unconnected-transmitter symbols
-    mask = v==0
-    v[mask] = np.random.choice([-1, 1], size=v.shape)[mask] 
-    return v
+    return {f'filter_{method}': dimod.generators.mimo.linear_filter(
+        channels, method=method, SNRoverNt=snr_over_nt) for method in methods}
 
 def apply_filters(signal, filters):
     """Decode a transmission with the given filters.
 
     Args:
-        signal: A received sequence of symbols, possibly noisy.
+        signal: Received sequence of symbols, possibly noisy.
         
-        filter: Linear filters used to decode the transmission.
+        filters: Linear filters used to decode the transmission.
 
     Returns:
         Dict of signals decoded with each of the given filters.
     """
    
-    return {name: apply_filter(filter, signal) for name, filter in filters.items()}
+    return {name: np.sign(np.real(np.matmul(filter, signal)))[:,0] for 
+        name, filter in filters.items()}
 
 def compare_signals(v, transmission, silent_return=False):
     """Compare two sequences of transmission symbols.
@@ -162,7 +125,7 @@ def time_filter_instantiation(network_sizes, methods=None):
 
         for method in methods:
             start_t = time.time_ns()
-            create_filter(channels, method=method)
+            create_filters(channels, methods=[method])
             time_ms = (time.time_ns() - start_t)/1000000
             times[method].append(time_ms)
             if time_ms < 500:
