@@ -17,6 +17,9 @@ import networkx as nx
 import numpy as np
 import dwave_networkx as dnx
 
+styles = {'QPU': 'b*', 'zero_forcing': 'g^', 'MMSE': 'mv', 'matched_filter': 'y>', 
+    'SA': 'rx', 'greedy': 'cp', 'tabu': 'kD'}
+
 def draw_network(network):
     """Plot the given network.
 
@@ -51,7 +54,8 @@ def draw_loop_comparison(results, network_size=16, ratio=1.5, SNRb=5):
     fig = plt.figure(figsize=(8, 3))
 
     for key in results:
-        plt.plot(results[key], "*-", label=key, markersize=5)
+        plt.plot(results[key], styles[key], label=key, markersize=5)
+        plt.plot(len(results[key])*[np.mean(results[key])], styles[key][0])
 
     plt.xlabel("Run")
     plt.ylabel("Success Rate [%]")
@@ -72,7 +76,7 @@ def draw_instantiation_times(times, network_sizes):
     fig = plt.figure(figsize=(8, 3))
 
     for key in times:
-        plt.plot(times[key], "*-", label=key, markersize=5)
+        plt.plot(times[key], styles[key] + '-', label=key, markersize=5)
 
     plt.xlabel("Network Size")
     plt.ylabel("Instantiation Time [ms]")
