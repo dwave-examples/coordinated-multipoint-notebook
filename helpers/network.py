@@ -149,7 +149,9 @@ def configure_network(network_size=16, qpu=None, ratio=1.5):
         
         qpu: QPU to which the graph must be compatible.
 
-        ratio: Required Tx/Rx ratio.
+        ratio: Required Tx/Rx ratio. A best-effort attempt is made to "turn off"
+            a random selection of most-connected receivers to achieve the requested 
+            ratio.
 
     Returns:
         Two-tuple of network graph and minor-embedding. 
