@@ -187,42 +187,15 @@ def configure_network(network_size=16, qpu=None, ratio=1.5):
     num_tx = len(tx_nodes)
     num_rx = len(rx_nodes)   
     num_rx_to_delete = int(num_rx - num_tx/ratio) 
-    adj_tx_adj_rx = {rx: sum(sum(network.nodes[n]['num_receivers'] for n in network.adj[tx]) 
+    while num_rx_to_delete > 0.02*num_tx:
+        adj_tx_adj_rx = {rx: sum(sum(network.nodes[n]['num_receivers'] for n in network.adj[tx]) 
             for tx in [tx for tx in network.adj[rx].keys()]) 
                 for rx in rx_nodes}
-
-    while num_rx_to_delete > 1:
-
-        rx_max_adj_rx = [rx for rx, v in adj_tx_adj_rx.items() if v == max(adj_tx_adj_rx.values())]   
-        rx_to_delete = random.sample(rx_max_adj_rx, len(rx_max_adj_rx))
-
-        while len(rx_to_delete) > 0 and num_rx_to_delete > 1:  
-            
-            candidate_rx = rx_to_delete[0]  
-            adj_txs = set(network.adj[candidate_rx])
-
-            adj_rxs = set()
-            for tx in adj_txs:
-                adj_rxs.update([rx for rx in network.adj[tx] if network.nodes[rx]["num_receivers"]]) 
-            adj_rxs.remove(candidate_rx)
-
-            rx_to_delete.remove(candidate_rx)
-            rx_nodes.remove(candidate_rx)
-            del adj_tx_adj_rx[candidate_rx]
-            network.nodes[candidate_rx]['num_receivers'] = 0
-            num_rx_to_delete -= 1
-
-            update_adj_tx_adj_rx = {rx: sum(sum(network.nodes[n]['num_receivers'] for n in network.adj[tx]) 
-                        for tx in set(network.adj[rx])) 
-                            for rx in adj_rxs}
-
-            for rx in adj_rxs:
-                adj_tx_adj_rx[rx] = update_adj_tx_adj_rx[rx]
-                if rx in rx_to_delete:
-                    rx_to_delete.remove(rx)
-
-        num_rx = len(rx_nodes)   
-        num_rx_to_delete = int(num_rx - num_tx/ratio) 
+        rx_max_adj_rx = [rx for rx, v in adj_tx_adj_rx.items() if v == max(adj_tx_adj_rx.values())]
+        rx_to_delete = random.sample(rx_max_adj_rx, min(len(rx_max_adj_rx), int(0.02*num_tx)))
+        nx.set_node_attributes(network.subgraph(rx_to_delete), values=0, name='num_receivers')         
+        rx_nodes = [n for n, v in nx.get_node_attributes(network, "num_receivers").items() if v==1]
+        num_rx_to_delete = int(len(rx_nodes) - num_tx/ratio)
         
     # Prevent disconnected transmitters 
     for tx in tx_nodes:
