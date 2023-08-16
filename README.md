@@ -13,7 +13,7 @@ In one variation,
 neighboring cellular base stations jointly process received signals to reduce 
 transmission-decoding errors.
 
-PLACEHOLDER FOR GRAPHIC FROM MICHAEL
+![Figure 1](_static/network_visual.jpg "Artistic rendition of a cellular network")
 
 High-quality decoding techniques are computationally expensive, especially in
 dense urban areas, characterized by high noise (low signal-to-noise ratios, SNR) 
