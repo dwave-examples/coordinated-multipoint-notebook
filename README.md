@@ -50,12 +50,12 @@ transmissions. Contemporary base stations use linear filters such as
 [Matched filter](https://en.wikipedia.org/wiki/Matched_filter) and 
 [minimum mean squared error (MMSE)](https://en.wikipedia.org/wiki/Minimum_mean_square_error). 
 However, these methods perform poorly in dense urban environments as the ratio 
-of cellphones to base stations and noise increase[[1]](#1). Additionally, advanced 
-decoding techniques improve throughput but demand computational resources that 
-grow exponentially with network size. Power consumption, therefore, is a problem.
-A quantum computer, in contrast, can provide powerful computational abilities 
-with low power needs. To solve the decoding problem with a quantum computer, 
-you formulate it as a 
+of cellphones to base stations and noise increase[[1]](#1). Additionally, complete 
+(or verifiable) decoding techniques, such as sphere decoding, improve throughput 
+but demand computational resources that grow exponentially with network size. 
+Power consumption, therefore, is a problem. A quantum computer, in contrast, can 
+provide powerful computational abilities with low power needs. To solve the 
+decoding problem with a quantum computer, you formulate it as a 
 [binary quadratic model](https://docs.dwavesys.com/docs/latest/c_gs_workflow.html).  
 
 The decoding problem is to find a sequence of symbols, with the length of the 
