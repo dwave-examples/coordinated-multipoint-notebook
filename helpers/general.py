@@ -67,7 +67,7 @@ def loop_comparisons(qpu, runs=5, network_size=16, snr=5, ratio=1.5, solvers=["m
         channels, channel_power =  create_channels(network)
         y, transmitted_symbols = simulate_signals(channels, channel_power, SNRb=SNR)
 
-        methods = list(set(ALL_METHODS) & set(solvers))
+        methods = set(ALL_METHODS).intersection(solvers)
         filters = create_filters(channels, methods=methods)
 
         bqm = dimod.generators.mimo.spin_encoded_comp(network, 
@@ -82,7 +82,10 @@ def loop_comparisons(qpu, runs=5, network_size=16, snr=5, ratio=1.5, solvers=["m
             chain_strength=-0.13*min(bqm.linear.values()), 
             label='Notebook - Coordinated Multipoint')
 
-        results["QPU"].append(round(100*sum(np.array(list(sampleset_qpu.first.sample.values())) == transmitted_symbols.flatten())/len(transmitted_symbols)))
+        def avg(ss, ts):
+            return round(100 * sum(np.array(list(ss.first.sample.values())) == ts.flatten()) / len(ts))
+        
+        results["QPU"].append(avg(sampleset_qpu, transmitted_symbols))
     
         v = apply_filters(y, filters)
         filter_results = compare_signals(v, transmitted_symbols, silent_return=True)

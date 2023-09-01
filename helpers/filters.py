@@ -40,8 +40,8 @@ def create_filters(channels, methods=None, snr_over_nt=float('inf')):
     """
     if not methods:
         methods = ALL_METHODS
-    elif set(methods).difference(ALL_METHODS):
-        raise ValueError(f"filter {set(methods).difference(ALL_METHODS)} not supported")
+    elif unknown := set(methods).difference(ALL_METHODS):
+        raise ValueError(f"filter {unknown} not supported")
     
     return {f'filter_{method}': dimod.generators.mimo.linear_filter(
         channels, method=method, SNRoverNt=snr_over_nt) for method in methods}

@@ -95,7 +95,7 @@ def _create_lattice(network_size=16, qpu=None):
     edge_list = None
 
     if qpu:
-        node_list = list(set(node_list) & set(qpu.nodelist))
+        node_list = list(set(node_list).intersection(qpu.nodelist))
         edge_list = qpu.edgelist
         
     qpu_graph = dnx.pegasus_graph(m=16, node_list=node_list, edge_list = edge_list)
@@ -156,7 +156,7 @@ def configure_network(network_size=16, qpu=None, ratio=1.5):
     Returns:
         Two-tuple of network graph and minor-embedding. 
     """
-    if network_size not in list(range(2, 17)):
+    if network_size not in range(2, 17):
         raise ValueError("Supported lattice sizes are between 4 to 16")		
 
     emb, source = _create_lattice(network_size=network_size, qpu=qpu)
