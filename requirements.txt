@@ -3,4 +3,5 @@ dwave-ocean-sdk>=6.4.0
 notebook~=7.0.0   # Check with Radomir on LeapIDE support 
 jupyter
 
+colorama
 matplotlib~=3.7
