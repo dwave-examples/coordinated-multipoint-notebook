@@ -257,9 +257,9 @@ def create_channels(
         
     """
     num_tx, num_rx = _num_tx_rx(network)
-    am = dimod.generators.mimo.lattice_to_attenuation_matrix(network)[0]
+    am = dimod.generators.wireless._lattice_to_attenuation_matrix(network)[0]
 
-    return dimod.generators.mimo.create_channel(
+    return dimod.generators.wireless.create_channel(
         num_receivers=num_rx, 
         num_transmitters=num_tx, 
         F_distribution=F_distribution,
@@ -288,7 +288,7 @@ def simulate_signals(
         num_tx = channels.shape[1]
         transmitted_symbols = np.random.choice([1, -1], size=[num_tx, 1]) 
 
-    y, v, _, _ = dimod.generators.mimo._create_signal(channels, 
+    y, v, _, _ = dimod.generators.wireless._create_signal(channels, 
         transmitted_symbols=transmitted_symbols,
         channel_power=channel_power,
         SNRb=SNRb)

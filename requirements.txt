@@ -1,6 +1,10 @@
-dwave-ocean-sdk>=6.4.0
+# Replace the following with something like dwave-ocean-sdk>=6.4.2
+dimod==0.12.12
+dwave-networkx==0.8.14
+dwave-samplers==1.0.0
+dwave-system==1.19.0
 
-notebook~=7.0.0   # Check with Radomir on LeapIDE support 
+notebook~=7.0.0   
 jupyter
 
 colorama

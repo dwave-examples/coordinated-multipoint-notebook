@@ -79,7 +79,7 @@ def loop_comparisons(qpu: dimod.sampler,
         methods = set(ALL_METHODS).intersection(solvers)
         filters = create_filters(channels, methods=methods)
 
-        bqm = dimod.generators.mimo.spin_encoded_comp(
+        bqm = dimod.generators.wireless.coordinated_multipoint(
             network, 
             modulation='BPSK', 
             transmitted_symbols=transmitted_symbols, 
