@@ -70,14 +70,17 @@ def loop_comparisons(qpu, runs=5, network_size=16, snr=5, ratio=1.5, solvers=["m
         methods = set(ALL_METHODS).intersection(solvers)
         filters = create_filters(channels, methods=methods)
 
-        bqm = dimod.generators.mimo.spin_encoded_comp(network, 
-            modulation = 'BPSK', 
+        bqm = dimod.generators.mimo.spin_encoded_comp(
+            network, 
+            modulation='BPSK', 
             transmitted_symbols=transmitted_symbols, 
             F_distribution=('binary','real'), 
             F=channels,
             y=y)
     
-        sampleset_qpu = sampler_qpu.sample(bqm, num_reads=30, 
+        sampleset_qpu = sampler_qpu.sample(
+            bqm, 
+            num_reads=30, 
             annealing_time=200, 
             chain_strength=-0.13*min(bqm.linear.values()), 
             label='Notebook - Coordinated Multipoint')

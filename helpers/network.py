@@ -89,8 +89,8 @@ def _create_lattice(network_size=16, qpu=None):
         Two tuple of embedding and the source lattice. 
     """
     p16_graph = dnx.pegasus_graph(m=16, nice_coordinates=True)
-    node_list = [dnx.pegasus_coordinates(16).nice_to_linear(node) 
-        for node in p16_graph.nodes if 
+    node_list = [
+        dnx.pegasus_coordinates(16).nice_to_linear(node) for node in p16_graph.nodes if 
         node[1]<network_size and node[2]<network_size]
     edge_list = None
 
@@ -226,7 +226,8 @@ def print_network_stats(network):
     print(f"Network has {num_tx} transmitters and {num_rx} receivers", 
           f"with {len(network.edges)} edges.")
 
-def create_channels(network, 
+def create_channels(
+    network, 
     F_distribution=("binary", "real"), 
     attenuation_matrix=None):
     """Create a matrix representing the network transmission channels. 
@@ -251,12 +252,14 @@ def create_channels(network,
     num_tx, num_rx = _num_tx_rx(network)
     am = dimod.generators.mimo.lattice_to_attenuation_matrix(network)[0]
 
-    return dimod.generators.mimo.create_channel(num_receivers=num_rx, 
+    return dimod.generators.mimo.create_channel(
+        num_receivers=num_rx, 
         num_transmitters=num_tx, 
         F_distribution=F_distribution,
         attenuation_matrix=am)
 
-def simulate_signals(channels, 
+def simulate_signals(
+    channels, 
     channel_power, 
     transmitted_symbols=None, 
     SNRb=float('Inf')):
