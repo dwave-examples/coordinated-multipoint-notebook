@@ -13,6 +13,7 @@
 #    limitations under the License.
 
 from colorama import Fore, Style
+from typing import Union
 
 import numpy as np
 import time
@@ -67,7 +68,7 @@ def apply_filters(signal: np.ndarray, filters: dict) -> dict:
 
 def compare_signals(v: np.ndarray, 
                     transmission: np.ndarray, 
-                    silent_return: bool = False) -> float:
+                    silence_printing: bool = False) -> Union[dict, float]:
     """Compare two sequences of transmission symbols.
 
     Args:
@@ -75,7 +76,7 @@ def compare_signals(v: np.ndarray,
 
         transmission: A sequence of transmission symbols.
 
-        silent_return: Boolean flag indicating whether to print results.
+        silence_printing: Boolean flag indicating whether to not print results.
 
     Returns:
         Percentage of the sequence with identical symbols (returned if `silent_return=True`).  
@@ -86,11 +87,9 @@ def compare_signals(v: np.ndarray,
         success_rate = {name: round(100*val/len(transmission)) for 
             name, val in success_rate.items()}
 
-        if not silent_return:
+        if not silence_printing:
             for name in success_rate.keys():
                 print(f"{name}: decoded with a success rate of {success_rate[name]}%.")
-        else:
-            return success_rate
     else:
         if isinstance(v, dimod.SampleSet):
             received = np.array(list(v.first.sample.values()))
@@ -99,11 +98,11 @@ def compare_signals(v: np.ndarray,
         else:
             raise ValueError("Unknown signal type")
         
-        sr = round(100*sum(received == transmission.flatten())/len(transmission))
-        if not silent_return:
-            print(f"Decoded with a success rate of {sr}%.")
-        else:
-            return sr
+        success_rate = round(100*sum(received == transmission.flatten())/len(transmission))
+        if not silence_printing:
+            print(f"Decoded with a success rate of {success_rate}%.")
+
+    return success_rate
     
 def time_filter_instantiation(network_sizes: list, methods: list = None):
     """Measure the instantiation time of filters.

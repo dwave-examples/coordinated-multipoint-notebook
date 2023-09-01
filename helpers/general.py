@@ -25,7 +25,7 @@ def loop_comparisons(qpu: dimod.sampler,
                      network_size: int = 16, 
                      snr: float = 5, 
                      ratio: float = 1.5, 
-                     solvers: list = ["matched_filter"]) -> dict:
+                     solvers: list = None) -> dict:
     """Compare decoding between multiple algorithms.
 
     Args:
@@ -38,7 +38,8 @@ def loop_comparisons(qpu: dimod.sampler,
 
         snr: Signal-to-noise ratio.
 
-        solvers: Algorithms used to decode the transmission. 
+        solvers: Algorithms used to decode the transmission. By default, 
+            uses matched filter.  
 
     Returns:
 
@@ -47,6 +48,9 @@ def loop_comparisons(qpu: dimod.sampler,
 
     if runs < 3:
         raise ValueError(f"Minimum supported runs is 3; got {runs}.")
+
+    if solvers is None:
+        solvers = ["matched_filter"]
 
     network, embedding = configure_network(
         network_size=network_size, 
@@ -96,7 +100,7 @@ def loop_comparisons(qpu: dimod.sampler,
         results["QPU"].append(avg(sampleset_qpu, transmitted_symbols))
     
         v = apply_filters(y, filters)
-        filter_results = compare_signals(v, transmitted_symbols, silent_return=True)
+        filter_results = compare_signals(v, transmitted_symbols, silence_printing=True)
         for filter in methods:
             results[filter].append(filter_results[f'filter_{filter}'])
 
