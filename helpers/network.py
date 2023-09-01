@@ -12,6 +12,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+from typing import Tuple
+
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
@@ -21,7 +23,7 @@ import dimod
 import dwave_networkx as dnx
 
 
-def _num_tx_rx(network):
+def _num_tx_rx(network: nx.Graph) -> Tuple[int, int]:
     """"Get the number of transmitters and receivers in the given network.
 
     Args:
@@ -35,16 +37,17 @@ def _num_tx_rx(network):
 
     return num_tx, num_rx
 
-def _node_to_chain(row, col): 
+def _node_to_chain(row: int, col: int) -> Tuple[
+    Tuple[int, int, int, int], Tuple[int, int, int, int]]: 
     """"Embed a node into a chain for a grid-with-diagonal lattice.
 
     Args:
-        row: Row, as an integer, in the lattice.
+        row: Row in the lattice.
 
-        col: Column, as an integer, in the lattice.
+        col: Column in the lattice.
 
     Returns:
-        Two-tuple of the two nodes, in Pegasus coordinates that constitute a
+        Two-tuple of the two nodes, in Pegasus coordinates, that constitute a
             chain representing the given node. 
 
     References:
@@ -77,7 +80,9 @@ def _node_to_chain(row, col):
         elif col_par == 2:
             return (0, x+1, 4, y), (1, y, 10, x)
 
-def _create_lattice(network_size=16, qpu=None):
+# Maintained here until Jack adds a general embedding algo to minorminer 
+def _create_lattice(network_size: int = 16, 
+                    qpu: dimod.sampler = None) -> Tuple[dict, nx.Graph]:
     """Create a lattice with an embedding
 
     Args:
@@ -140,7 +145,9 @@ def _create_lattice(network_size=16, qpu=None):
 
     return emb, source
 
-def configure_network(network_size=16, qpu=None, ratio=1.5):
+def configure_network(network_size: int = 16, 
+                      qpu: dimod.sampler = None, 
+                      ratio: float = 1.5) -> Tuple[nx.Graph, dict]:
     """Configure network transmitters and receivers.
 
     Args:
@@ -213,7 +220,7 @@ def configure_network(network_size=16, qpu=None, ratio=1.5):
 
     return network, emb
 
-def print_network_stats(network):
+def print_network_stats(network: nx.Graph):
     """Print statistics on the network graph.
 
     Args:
@@ -227,9 +234,9 @@ def print_network_stats(network):
           f"with {len(network.edges)} edges.")
 
 def create_channels(
-    network, 
-    F_distribution=("binary", "real"), 
-    attenuation_matrix=None):
+    network: nx.Graph, 
+    F_distribution: Tuple[str, str] = ("binary", "real"), 
+    attenuation_matrix: np.ndarray = None) -> Tuple[np.ndarray, float]:
     """Create a matrix representing the network transmission channels. 
 
     Args:
@@ -259,10 +266,10 @@ def create_channels(
         attenuation_matrix=am)
 
 def simulate_signals(
-    channels, 
-    channel_power, 
-    transmitted_symbols=None, 
-    SNRb=float('Inf')):
+    channels: np.ndarray, 
+    channel_power: float, 
+    transmitted_symbols: np.ndarray = None, 
+    SNRb: float = float('Inf')) -> Tuple[np.ndarray, np.ndarray]:
     """Simulate transmitted signal.
 
     Args:

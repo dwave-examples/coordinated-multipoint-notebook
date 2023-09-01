@@ -20,7 +20,12 @@ from dwave.samplers import SimulatedAnnealingSampler, SteepestDescentSampler, Ta
 from dwave.system import FixedEmbeddingComposite
 from helpers.network import configure_network, create_channels, print_network_stats, simulate_signals
 
-def loop_comparisons(qpu, runs=5, network_size=16, snr=5, ratio=1.5, solvers=["matched_filter"]):
+def loop_comparisons(qpu: dimod.sampler, 
+                     runs: int = 5, 
+                     network_size: int = 16, 
+                     snr: float = 5, 
+                     ratio: float = 1.5, 
+                     solvers: list = ["matched_filter"]) -> dict:
     """Compare decoding between multiple algorithms.
 
     Args:

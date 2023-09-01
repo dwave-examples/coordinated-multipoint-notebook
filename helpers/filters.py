@@ -21,7 +21,9 @@ from helpers.draw import draw_instantiation_times
 
 ALL_METHODS = ['zero_forcing', 'matched_filter', 'MMSE']
 
-def create_filters(channels, methods=None, snr_over_nt=float('inf')):
+def create_filters(channels: np.ndarray, 
+                   methods: list = None, 
+                   snr_over_nt: float = float('inf')) -> dict:
     """Instantiate linear filters.
 
     Args:
@@ -46,7 +48,7 @@ def create_filters(channels, methods=None, snr_over_nt=float('inf')):
     return {f'filter_{method}': dimod.generators.mimo.linear_filter(
         channels, method=method, SNRoverNt=snr_over_nt) for method in methods}
 
-def apply_filters(signal, filters):
+def apply_filters(signal: np.ndarray, filters: dict) -> dict:
     """Decode a transmission with the given filters.
 
     Args:
@@ -61,7 +63,9 @@ def apply_filters(signal, filters):
     return {name: np.sign(np.real(np.matmul(filter, signal)))[:,0] for 
         name, filter in filters.items()}
 
-def compare_signals(v, transmission, silent_return=False):
+def compare_signals(v: np.ndarray, 
+                    transmission: np.ndarray, 
+                    silent_return: bool = False) -> float:
     """Compare two sequences of transmission symbols.
 
     Args:
@@ -99,7 +103,7 @@ def compare_signals(v, transmission, silent_return=False):
         else:
             return sr
     
-def time_filter_instantiation(network_sizes, methods=None):
+def time_filter_instantiation(network_sizes: list, methods: list = None):
     """Measure the instantiation time of filters.
 
     Args:

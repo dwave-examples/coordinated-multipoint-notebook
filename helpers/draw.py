@@ -15,12 +15,13 @@
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
+
 import dwave_networkx as dnx
 
 styles = {'QPU': 'b*', 'zero_forcing': 'g^', 'MMSE': 'mv', 'matched_filter': 'y>', 
     'SA': 'rx', 'greedy': 'cp', 'tabu': 'kD'}
 
-def draw_network(network):
+def draw_network(network: nx.Graph):
     """Plot the given network.
 
     Args:
@@ -39,7 +40,10 @@ def draw_network(network):
         with_labels=False, node_size=50)
     plt.show()
 
-def draw_loop_comparison(results, network_size=16, ratio=1.5, SNRb=5):
+def draw_loop_comparison(results: dict, 
+                         network_size: int = 16, 
+                         ratio: float = 1.5, 
+                         SNRb: float = 5):
     """Plot results of decoding comparisons.
 
     Args:
@@ -64,7 +68,7 @@ def draw_loop_comparison(results, network_size=16, ratio=1.5, SNRb=5):
     plt.suptitle(f"Network size={network_size}, Tx/Rx$\\approx${ratio}, SNRb={SNRb}")
     plt.show()
 
-def draw_instantiation_times(times, network_sizes):
+def draw_instantiation_times(times: dict, network_sizes: dict):
     """Plot results of decoding comparisons.
 
     Args:
