@@ -82,7 +82,7 @@ class TestJupyterNotebook(unittest.TestCase):
 
         #Section Decoding Transmissions (Classical), subsection Decode Received Signals, apply filter
         cell_output = cell_text(nb, 12)
-        self.assertTrue("filter_zero_forcing: decoded with a success rate" in cell_output)
+        self.assertTrue("zero_forcing: decoded with a success rate" in cell_output)
 
         #Section Decoding Transmissions (Classical), subsection Scaling Up, timing
         cell_output = cell_text(nb, 15)

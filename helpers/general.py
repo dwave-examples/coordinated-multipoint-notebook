@@ -102,7 +102,7 @@ def loop_comparisons(qpu: dimod.sampler,
         v = apply_filters(y, filters)
         filter_results = compare_signals(v, transmitted_symbols, silence_printing=True)
         for filter in methods:
-            results[filter].append(filter_results[f'filter_{filter}'])
+            results[filter].append(filter_results[f'{filter}'])
 
         # The next lines can be automated but the gain is not worth the complication
         if 'SA' in solvers:

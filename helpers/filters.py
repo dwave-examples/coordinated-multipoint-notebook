@@ -48,7 +48,7 @@ def create_filters(channels: np.ndarray,
     elif unknown := set(methods).difference(ALL_METHODS):
         raise ValueError(f"filter {unknown} not supported")
     
-    return {f'filter_{method}': dimod.generators.wireless.linear_filter(
+    return {f'{method}': dimod.generators.wireless.linear_filter(
         channels, method=method, SNRoverNt=snr_over_nt) for method in methods}
 
 def apply_filters(signal: np.ndarray, filters: dict) -> dict:
