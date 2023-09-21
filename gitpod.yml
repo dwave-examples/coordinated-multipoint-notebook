@@ -1,4 +1,4 @@
 tasks:
-  - name: name: Use dimod 0.12.12 and run jupyter notebook
+  - name: Use dimod 0.12.12 and run jupyter notebook
     init: pip install -r requirements.txt
     command: jupyter notebook *.ipynb
