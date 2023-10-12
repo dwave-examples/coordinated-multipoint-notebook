@@ -1,6 +1,6 @@
 dwave-ocean-sdk>=6.6.0
 
-notebook~=7.0.0   
+notebook~=7.0   
 jupyter
 
 colorama
