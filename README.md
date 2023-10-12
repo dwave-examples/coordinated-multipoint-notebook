@@ -26,22 +26,31 @@ cellular networks.
 
 ## Installation
 
-You can run this example
-[in the Leap IDE](https://ide.dwavesys.io/#https://github.com/dwave-examples/cooperative-multipoint).
+You can run this example without installation in
+[the Leap IDE](https://ide.dwavesys.io/#https://github.com/dwave-examples/cooperative-multipoint)
+or other cloud-based IDEs that support the 
+[Development Containers specification](https://containers.dev/supporting)
+(aka "devcontainers") such as [GitHub Codespaces](https://docs.github.com/codespaces).
 
-Alternatively, install requirements locally (ideally, in a virtual environment):
+For development environments that do not support ``devcontainers``, install 
+requirements:
 
     pip install -r requirements.txt
 
+If you are cloning the repo to your local system, working in a 
+[virtual environment](https://docs.python.org/3/library/venv.html) is 
+recommended. 
+
 ## Usage
 
-To run the notebook:
+The notebook opens automatically in the Leap IDE and can be opened by clicking 
+on the ``01-coordinated-multipoint.ipynb`` file in Codespaces. 
+
+To run a locally installed notebook:
 
 ```bash
 jupyter notebook
 ```
-
-[^1]: Leap's IDE, which runs VS Code, does not support all notebook extensions. 
 
 ## Problem Formulation
 
