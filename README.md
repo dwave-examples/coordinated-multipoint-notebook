@@ -1,6 +1,3 @@
-[![Open in Leap IDE](
-  https://cdn-assets.cloud.dwavesys.com/shared/latest/badges/leapide.svg)](
-  https://ide.dwavesys.io/#https://github.com/dwave-examples/cooperative-multipoint)
 
 # Decoding Cellphone Signals
 
@@ -26,11 +23,9 @@ cellular networks.
 
 ## Installation
 
-You can run this example without installation in
-[the Leap IDE](https://ide.dwavesys.io/#https://github.com/dwave-examples/cooperative-multipoint)
-or other cloud-based IDEs that support the 
-[Development Containers specification](https://containers.dev/supporting)
-(aka "devcontainers") such as [GitHub Codespaces](https://docs.github.com/codespaces).
+You can run this example without installation in cloud-based IDEs that support 
+the [Development Containers specification](https://containers.dev/supporting)
+(aka "devcontainers").
 
 For development environments that do not support ``devcontainers``, install 
 requirements:
@@ -43,8 +38,13 @@ recommended.
 
 ## Usage
 
-The notebook opens automatically in the Leap IDE and can be opened by clicking 
-on the ``01-coordinated-multipoint.ipynb`` file in Codespaces. 
+Your development environment should be configured to 
+[access Leap’s Solvers](https://docs.ocean.dwavesys.com/en/stable/overview/sapi.html).
+You can see information about supported IDEs and authorizing access to your 
+Leap account [here](https://docs.dwavesys.com/docs/latest/doc_leap_dev_env.html).  
+
+The notebook can be opened by clicking on the 
+``01-coordinated-multipoint.ipynb`` file in VS Code-based IDEs. 
 
 To run a locally installed notebook:
 
