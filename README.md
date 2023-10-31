@@ -1,3 +1,6 @@
+[![Open in GitHub Codespaces](
+  https://img.shields.io/badge/Open%20in%20GitHub%20Codespaces-333?logo=github)](
+  https://codespaces.new/dwave-examples/coordinated-multipoint-notebook?quickstart=1)
 
 # Decoding Cellphone Signals
 
