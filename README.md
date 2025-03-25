@@ -42,9 +42,10 @@ recommended.
 ## Usage
 
 Your development environment should be configured to 
-[access Leap’s Solvers](https://docs.ocean.dwavesys.com/en/stable/overview/sapi.html).
+[access Leap’s Solvers](https://docs.dwavequantum.com/en/latest/ocean/sapi_access_basic.html).
 You can see information about supported IDEs and authorizing access to your 
-Leap account [here](https://docs.dwavesys.com/docs/latest/doc_leap_dev_env.html).  
+Leap account
+[here](https://docs.dwavequantum.com/en/latest/ocean/leap_authorization.html).  
 
 The notebook can be opened by clicking on the 
 ``01-coordinated-multipoint.ipynb`` file in VS Code-based IDEs. 
@@ -68,7 +69,7 @@ but demand computational resources that grow exponentially with network size.
 Power consumption, therefore, is a problem. A quantum computer, in contrast, can 
 provide powerful computational abilities with low power needs. To solve the 
 decoding problem with a quantum computer, you formulate it as a 
-[binary quadratic model](https://docs.dwavesys.com/docs/latest/c_gs_workflow.html).  
+[binary quadratic model](https://docs.dwavequantum.com/en/latest/quantum_research/workflow.html).  
 
 The decoding problem is to find a sequence of symbols, with the length of the 
 number of transmitters, that minimizes the difference between the received 
@@ -88,7 +89,7 @@ the Hermitian transpose denoted with the dagger symbol.
 
 Reference [[2]](#2) below formulates the transmission-decoding problem as an 
 Ising model and you can see Ocean software's implementation in 
-[dimod](https://docs.ocean.dwavesys.com/en/stable/docs_dimod/sdk_index.html).
+[dimod](https://docs.dwavequantum.com/en/latest/ocean/api_ref_dimod/index.html).
 
 In brief, in the case of BPSK handled by this example, symbols are 1 or -1, 
 and you can reduce the objective to,
