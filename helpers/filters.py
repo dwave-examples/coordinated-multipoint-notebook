@@ -12,7 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-from colorama import Fore, Style
+from colored import Fore, Style
 from typing import Union
 
 import numpy as np
@@ -136,7 +136,7 @@ def time_filter_instantiation(network_sizes: list, methods: list = None):
             if time_ms < 500:
                 print(f"\t* {method} took about {round(time_ms)} milliseconds.")
             else:
-                print(f"\t* {method} took about {Fore.RED} {round(time_ms)}" +  
-                      f"{Style.RESET_ALL}  milliseconds.")
+                print(f"\t* {method} took about {Fore.red} {round(time_ms)}" +  
+                      f"{Style.reset}  milliseconds.")
 
     draw_instantiation_times(times, network_sizes)

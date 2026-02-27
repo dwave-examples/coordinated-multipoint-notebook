@@ -1,7 +1,5 @@
-dwave-ocean-sdk>=6.6.0
-
-notebook~=7.0   
-jupyter
-
-colorama
-matplotlib~=3.7
+dwave-ocean-sdk~=9.3
+colored~=2.3
+jupyter~=1.1
+matplotlib~=3.10
+notebook~=7.5
