@@ -1,4 +1,4 @@
-dwave-ocean-sdk~=9.3
+dwave-ocean-sdk~=9.4
 colored~=2.3
 jupyter~=1.1
 matplotlib~=3.10

@@ -14,13 +14,12 @@
 
 from typing import Tuple
 
-import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 import random
 
 import dimod
-import dwave_networkx as dnx
+import dwave.graphs as dwave_graphs
 
 
 def _num_tx_rx(network: nx.Graph) -> Tuple[int, int]:
@@ -93,9 +92,9 @@ def _create_lattice(network_size: int = 16,
     Returns:
         Two tuple of embedding and the source lattice. 
     """
-    p16_graph = dnx.pegasus_graph(m=16, nice_coordinates=True)
+    p16_graph = dwave_graphs.pegasus_graph(m=16, nice_coordinates=True)
     node_list = [
-        dnx.pegasus_coordinates(16).nice_to_linear(node) for node in p16_graph.nodes if 
+        dwave_graphs.pegasus_coordinates(16).nice_to_linear(node) for node in p16_graph.nodes if 
         node[1]<network_size and node[2]<network_size]
     edge_list = None
 
@@ -103,10 +102,10 @@ def _create_lattice(network_size: int = 16,
         node_list = list(set(node_list).intersection(qpu.nodelist))
         edge_list = qpu.edgelist
         
-    qpu_graph = dnx.pegasus_graph(m=16, node_list=node_list, edge_list = edge_list)
+    qpu_graph = dwave_graphs.pegasus_graph(m=16, node_list=node_list, edge_list = edge_list)
 
     target = nx.relabel_nodes(qpu_graph, 
-        {n: dnx.pegasus_coordinates(16).linear_to_pegasus(n) 
+        {n: dwave_graphs.pegasus_coordinates(16).linear_to_pegasus(n) 
         for n in qpu_graph.nodes()})
 
     scale = 3*(network_size - 1)
@@ -214,8 +213,8 @@ def configure_network(network_size: int = 16,
             add_rx = candidates[np.random.randint(0, len(candidates))]
             network.nodes[add_rx]['num_receivers'] = 1
     
-    emb = {idx: [dnx.pegasus_coordinates(16).pegasus_to_linear(n[0]), 
-                dnx.pegasus_coordinates(16).pegasus_to_linear(n[1])] for 
+    emb = {idx: [dwave_graphs.pegasus_coordinates(16).pegasus_to_linear(n[0]), 
+                dwave_graphs.pegasus_coordinates(16).pegasus_to_linear(n[1])] for 
                 idx, (tx, n) in enumerate(emb.items())}
 
     return network, emb
