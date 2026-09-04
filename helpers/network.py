@@ -19,7 +19,7 @@ import numpy as np
 import random
 
 import dimod
-import dwave.graphs as dwave_graphs
+from dwave.graphs import pegasus_graph, pegasus_coordinates
 
 
 def _num_tx_rx(network: nx.Graph) -> Tuple[int, int]:
@@ -92,9 +92,9 @@ def _create_lattice(network_size: int = 16,
     Returns:
         Two tuple of embedding and the source lattice. 
     """
-    p16_graph = dwave_graphs.pegasus_graph(m=16, nice_coordinates=True)
+    p16_graph = pegasus_graph(m=16, nice_coordinates=True)
     node_list = [
-        dwave_graphs.pegasus_coordinates(16).nice_to_linear(node) for node in p16_graph.nodes if 
+        pegasus_coordinates(16).nice_to_linear(node) for node in p16_graph.nodes if 
         node[1]<network_size and node[2]<network_size]
     edge_list = None
 
@@ -102,10 +102,10 @@ def _create_lattice(network_size: int = 16,
         node_list = list(set(node_list).intersection(qpu.nodelist))
         edge_list = qpu.edgelist
         
-    qpu_graph = dwave_graphs.pegasus_graph(m=16, node_list=node_list, edge_list = edge_list)
+    qpu_graph = pegasus_graph(m=16, node_list=node_list, edge_list = edge_list)
 
     target = nx.relabel_nodes(qpu_graph, 
-        {n: dwave_graphs.pegasus_coordinates(16).linear_to_pegasus(n) 
+        {n: pegasus_coordinates(16).linear_to_pegasus(n) 
         for n in qpu_graph.nodes()})
 
     scale = 3*(network_size - 1)
@@ -213,8 +213,8 @@ def configure_network(network_size: int = 16,
             add_rx = candidates[np.random.randint(0, len(candidates))]
             network.nodes[add_rx]['num_receivers'] = 1
     
-    emb = {idx: [dwave_graphs.pegasus_coordinates(16).pegasus_to_linear(n[0]), 
-                dwave_graphs.pegasus_coordinates(16).pegasus_to_linear(n[1])] for 
+    emb = {idx: [pegasus_coordinates(16).pegasus_to_linear(n[0]), 
+                pegasus_coordinates(16).pegasus_to_linear(n[1])] for 
                 idx, (tx, n) in enumerate(emb.items())}
 
     return network, emb
