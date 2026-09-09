@@ -16,7 +16,6 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 
-import dwave_networkx as dnx
 
 styles = {'QPU': 'b*', 'zero_forcing': 'g^', 'MMSE': 'mv', 'matched_filter': 'y>', 
     'SA': 'rx', 'greedy': 'cp', 'tabu': 'kD'}
