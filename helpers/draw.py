@@ -16,28 +16,29 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 
-
 # Colors are from the Okabe-Ito palette, which remains distinguishable under
 # the common forms of color-vision deficiency. Every series also has a distinct
 # marker so that meaning is never carried by color alone.
 styles = {
-    'QPU':            {'color': '#0072B2', 'marker': '*'},   # blue, star
-    'zero_forcing':   {'color': '#009E73', 'marker': '^'},   # green, up triangle
-    'MMSE':           {'color': '#CC79A7', 'marker': 'v'},   # pink, down triangle
-    'matched_filter': {'color': '#E69F00', 'marker': '>'},   # orange, right triangle
-    'SA':             {'color': '#D55E00', 'marker': 'x'},   # vermillion, cross
-    'greedy':         {'color': '#56B4E9', 'marker': 'p'},   # sky blue, pentagon
-    'tabu':           {'color': '#000000', 'marker': 'D'},   # black, diamond
+    "QPU": {"color": "#0072B2", "marker": "*"},  # blue, star
+    "zero_forcing": {"color": "#009E73", "marker": "^"},  # green, up triangle
+    "MMSE": {"color": "#CC79A7", "marker": "v"},  # pink, down triangle
+    "matched_filter": {"color": "#E69F00", "marker": ">"},  # orange, right triangle
+    "SA": {"color": "#D55E00", "marker": "x"},  # vermillion, cross
+    "greedy": {"color": "#56B4E9", "marker": "p"},  # sky blue, pentagon
+    "tabu": {"color": "#000000", "marker": "D"},  # black, diamond
 }
 
 # Network node appearance: transmitters and receivers differ in shape and color.
 NODE_STYLES = {
-    'transmitter': {'color': '#E69F00', 'shape': 's', 'size': 50,
-                    'label': 'Transmitter (cellphone)'},
-    'receiver':    {'color': '#0072B2', 'shape': 'o', 'size': 50,
-                    'label': 'Receiver (base station)'},
-    'off':         {'color': 'white', 'shape': 'o', 'size': 20,
-                    'label': 'Turned-off base station'},
+    "transmitter": {
+        "color": "#E69F00",
+        "shape": "s",
+        "size": 50,
+        "label": "Transmitter (cellphone)",
+    },
+    "receiver": {"color": "#0072B2", "shape": "o", "size": 50, "label": "Receiver (base station)"},
+    "off": {"color": "white", "shape": "o", "size": 20, "label": "Turned-off base station"},
 }
 
 
@@ -56,13 +57,13 @@ def draw_network(network: nx.Graph):
     else:
         fig = plt.figure(figsize=(10, 10))
 
-    tx = nx.get_node_attributes(network, 'num_transmitters')
-    rx = nx.get_node_attributes(network, 'num_receivers')
+    tx = nx.get_node_attributes(network, "num_transmitters")
+    rx = nx.get_node_attributes(network, "num_receivers")
 
     groups = {
-        'transmitter': [n for n in network.nodes() if tx[n]],
-        'receiver': [n for n in network.nodes() if not tx[n] and rx[n]],
-        'off': [n for n in network.nodes() if not tx[n] and not rx[n]],
+        "transmitter": [n for n in network.nodes() if tx[n]],
+        "receiver": [n for n in network.nodes() if not tx[n] and rx[n]],
+        "off": [n for n in network.nodes() if not tx[n] and not rx[n]],
     }
     pos = {n: n for n in network.nodes()}
 
@@ -71,32 +72,39 @@ def draw_network(network: nx.Graph):
     # turned-off node. This matches the static diagram in the notebook.
     def _edge_color(u, v):
         if tx[u] and tx[v]:
-            return NODE_STYLES['transmitter']['color']
+            return NODE_STYLES["transmitter"]["color"]
         if (tx[u] or tx[v]) and (rx[u] or rx[v]):
-            return NODE_STYLES['receiver']['color']
-        return '#BBBBBB'
+            return NODE_STYLES["receiver"]["color"]
+        return "#BBBBBB"
 
-    nx.draw_networkx_edges(network, pos=pos,
-        edge_color=[_edge_color(u, v) for u, v in network.edges()], width=0.8)
+    nx.draw_networkx_edges(
+        network, pos=pos, edge_color=[_edge_color(u, v) for u, v in network.edges()], width=0.8
+    )
     for kind, nodes in groups.items():
         if not nodes:
             continue
         style = NODE_STYLES[kind]
-        nx.draw_networkx_nodes(network, pos=pos, nodelist=nodes,
-            node_color=style['color'], node_shape=style['shape'],
-            node_size=style['size'], edgecolors='#555555', linewidths=0.8,
-            label=style['label'])
+        nx.draw_networkx_nodes(
+            network,
+            pos=pos,
+            nodelist=nodes,
+            node_color=style["color"],
+            node_shape=style["shape"],
+            node_size=style["size"],
+            edgecolors="#555555",
+            linewidths=0.8,
+            label=style["label"],
+        )
 
-    plt.legend(loc='upper left', bbox_to_anchor=(1.01, 1), scatterpoints=1)
-    plt.axis('off')
+    plt.legend(loc="upper left", bbox_to_anchor=(1.01, 1), scatterpoints=1)
+    plt.axis("off")
     plt.tight_layout()
     plt.show()
 
 
-def draw_loop_comparison(results: dict,
-                         network_size: int = 16,
-                         ratio: float = 1.5,
-                         SNRb: float = 5):
+def draw_loop_comparison(
+    results: dict, network_size: int = 16, ratio: float = 1.5, SNRb: float = 5
+):
     """Plot results of decoding comparisons.
 
     Each solver is drawn with its own marker and color, and its mean is drawn
@@ -112,16 +120,21 @@ def draw_loop_comparison(results: dict,
 
     for key in results:
         style = styles[key]
-        plt.plot(results[key], linestyle='none', marker=style['marker'],
-                 color=style['color'], label=key, markersize=6)
-        plt.plot(len(results[key])*[np.mean(results[key])],
-                 color=style['color'], linewidth=1)
+        plt.plot(
+            results[key],
+            linestyle="none",
+            marker=style["marker"],
+            color=style["color"],
+            label=key,
+            markersize=6,
+        )
+        plt.plot(len(results[key]) * [np.mean(results[key])], color=style["color"], linewidth=1)
 
     plt.xlabel("Run")
     plt.ylabel("Success Rate [%]")
-    plt.legend(loc='upper left', bbox_to_anchor=(1.01, 1))
+    plt.legend(loc="upper left", bbox_to_anchor=(1.01, 1))
     plt.grid(alpha=0.3)
-    plt.xticks(range(len(results[key])))    # All results are the same length (runs)
+    plt.xticks(range(len(results[key])))  # All results are the same length (runs)
     plt.suptitle(f"Network size={network_size}, Tx/Rx$\\approx${ratio}, SNRb={SNRb}")
     plt.show()
 
@@ -138,8 +151,14 @@ def draw_instantiation_times(times: dict, network_sizes: dict):
 
     for key in times:
         style = styles[key]
-        plt.plot(times[key], linestyle='-', marker=style['marker'],
-                 color=style['color'], label=key, markersize=6)
+        plt.plot(
+            times[key],
+            linestyle="-",
+            marker=style["marker"],
+            color=style["color"],
+            label=key,
+            markersize=6,
+        )
 
     plt.xlabel("Network Size")
     plt.ylabel("Instantiation Time [ms]")
