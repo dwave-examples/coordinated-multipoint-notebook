@@ -1,4 +1,4 @@
-# Copyright 2023 D-Wave Systems Inc.
+# Copyright 2023 D-Wave
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -31,13 +31,10 @@ def create_filters(channels: np.ndarray,
 
     Args:
         channels: Transmission channels.
-
         methods: Types of filter. Supported values are:
-
             * 'matched_filter': Matched filter.
             * 'MMSE': Minimum mean square error filter.
             * 'zero_forcing': Zero forcing filter.
-
         snr_over_nt: Signal-to-noise ratio.
 
     Returns:
@@ -56,7 +53,6 @@ def apply_filters(signal: np.ndarray, filters: dict) -> dict:
 
     Args:
         signal: Received sequence of symbols, possibly noisy.
-        
         filters: Linear filters used to decode the transmission.
 
     Returns:
@@ -73,9 +69,7 @@ def compare_signals(v: np.ndarray,
 
     Args:
         v: A sequence of transmission symbols.
-
         transmission: A sequence of transmission symbols.
-
         silence_printing: Boolean flag indicating whether to not print results.
 
     Returns:
@@ -109,9 +103,7 @@ def time_filter_instantiation(network_sizes: list, methods: list = None):
 
     Args:
         network_sizes: Sizes of the underlying lattice, :math:`3*(network_size - 1)`.
-
         methods: Types of filter. Supported values are:
-
             * 'matched_filter': Matched filter.
             * 'MMSE': Minimum mean square error filter.
             * 'zero_forcing': Zero forcing filter.
@@ -136,7 +128,7 @@ def time_filter_instantiation(network_sizes: list, methods: list = None):
             if time_ms < 500:
                 print(f"\t* {method} took about {round(time_ms)} milliseconds.")
             else:
-                print(f"\t* {method} took about {Fore.red} {round(time_ms)}" +  
-                      f"{Style.reset}  milliseconds.")
+                print(f"\t* {method} took about {Fore.red}{round(time_ms)}" +
+                      f" milliseconds (slow).{Style.reset}")
 
     draw_instantiation_times(times, network_sizes)

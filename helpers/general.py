@@ -1,4 +1,4 @@
-# Copyright 2023 D-Wave Systems Inc.
+# Copyright 2023 D-Wave
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -20,29 +20,26 @@ from dwave.samplers import SimulatedAnnealingSampler, SteepestDescentSampler, Ta
 from dwave.system import FixedEmbeddingComposite
 from helpers.network import configure_network, create_channels, print_network_stats, simulate_signals
 
-def loop_comparisons(qpu: dimod.sampler, 
-                     runs: int = 5, 
-                     network_size: int = 16, 
-                     snr: float = 5, 
-                     ratio: float = 1.5, 
-                     solvers: list = None) -> dict:
+def loop_comparisons(
+    qpu: dimod.sampler, 
+    runs: int = 5, 
+    network_size: int = 16, 
+    snr: float = 5, 
+    ratio: float = 1.5, 
+    solvers: list = None
+) -> dict:
     """Compare decoding between multiple algorithms.
 
     Args:
         qpu: Quantum computer.
-
         runs: Number of problems to generate for comparisons.
-
         network_size: Size of the lattice underlying the network, 
             given as :math:`3*(network_size - 1)`.
-
         snr: Signal-to-noise ratio.
-
         solvers: Algorithms used to decode the transmission. By default, 
             uses matched filter.  
 
     Returns:
-
         Results of the comparisons, as a dict.
     """
 
