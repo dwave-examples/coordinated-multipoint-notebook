@@ -19,7 +19,7 @@ import numpy as np
 # Colors are from the Okabe-Ito palette, which remains distinguishable under
 # the common forms of color-vision deficiency. Every series also has a distinct
 # marker so that meaning is never carried by color alone.
-styles = {
+STYLES = {
     "QPU": {"color": "#0072B2", "marker": "*"},  # blue, star
     "zero_forcing": {"color": "#009E73", "marker": "^"},  # green, up triangle
     "MMSE": {"color": "#CC79A7", "marker": "v"},  # pink, down triangle
@@ -52,10 +52,7 @@ def draw_network(network: nx.Graph):
     Args:
         network: Network graph.
     """
-    if len(network) < 1000:
-        fig = plt.figure(figsize=(8, 3))
-    else:
-        fig = plt.figure(figsize=(10, 10))
+    plt.figure(figsize=(8, 3))
 
     tx = nx.get_node_attributes(network, "num_transmitters")
     rx = nx.get_node_attributes(network, "num_receivers")
@@ -67,22 +64,10 @@ def draw_network(network: nx.Graph):
     }
     pos = {n: n for n in network.nodes()}
 
-    # Color edges by what they join: orange for the transmitter lattice, blue
-    # for transmitter-to-receiver channels, grey for anything touching a
-    # turned-off node. This matches the static diagram in the notebook.
-    def _edge_color(u, v):
-        if tx[u] and tx[v]:
-            return NODE_STYLES["transmitter"]["color"]
-        if (tx[u] or tx[v]) and (rx[u] or rx[v]):
-            return NODE_STYLES["receiver"]["color"]
-        return "#BBBBBB"
-
     nx.draw_networkx_edges(
-        network, pos=pos, edge_color=[_edge_color(u, v) for u, v in network.edges()], width=0.8
+        network, pos=pos, edge_color="#BBBBBB", width=0.8
     )
     for kind, nodes in groups.items():
-        if not nodes:
-            continue
         style = NODE_STYLES[kind]
         nx.draw_networkx_nodes(
             network,
@@ -96,7 +81,7 @@ def draw_network(network: nx.Graph):
             label=style["label"],
         )
 
-    plt.legend(loc="upper left", bbox_to_anchor=(1.01, 1), scatterpoints=1)
+    plt.legend(loc="upper left", bbox_to_anchor=(1.01, 1))
     plt.axis("off")
     plt.tight_layout()
     plt.show()
@@ -116,43 +101,44 @@ def draw_loop_comparison(
         ratio: Ratio of transmitters to receivers.
         SNRb: Signal-to-noise ratio.
     """
-    fig = plt.figure(figsize=(8, 3))
+    plt.figure(figsize=(8, 3))
+    runs = len(next(iter(results.values())))  # All results have the same number of runs
 
-    for key in results:
-        style = styles[key]
+    for key, values in results.items():
+        style = STYLES[key]
         plt.plot(
-            results[key],
+            values,
             linestyle="none",
             marker=style["marker"],
             color=style["color"],
             label=key,
             markersize=6,
         )
-        plt.plot(len(results[key]) * [np.mean(results[key])], color=style["color"], linewidth=1)
+        plt.axhline(np.mean(values), color=style["color"], linewidth=1)
 
     plt.xlabel("Run")
     plt.ylabel("Success Rate [%]")
     plt.legend(loc="upper left", bbox_to_anchor=(1.01, 1))
     plt.grid(alpha=0.3)
-    plt.xticks(range(len(results[key])))  # All results are the same length (runs)
+    plt.xticks(range(runs))
     plt.suptitle(f"Network size={network_size}, Tx/Rx$\\approx${ratio}, SNRb={SNRb}")
     plt.show()
 
 
-def draw_instantiation_times(times: dict, network_sizes: dict):
+def draw_instantiation_times(times: dict, network_sizes: list):
     """Plot filter instantiation times for a range of network sizes.
 
     Args:
-        times: Instantiations times, as a dict.
+        times: Instantiation times, as a dict.
         network_sizes: Sizes of the underlying lattice.
     """
 
-    fig = plt.figure(figsize=(8, 3))
+    plt.figure(figsize=(8, 3))
 
-    for key in times:
-        style = styles[key]
+    for key, values in times.items():
+        style = STYLES[key]
         plt.plot(
-            times[key],
+            values,
             linestyle="-",
             marker=style["marker"],
             color=style["color"],
@@ -164,6 +150,6 @@ def draw_instantiation_times(times: dict, network_sizes: dict):
     plt.ylabel("Instantiation Time [ms]")
     plt.legend()
     plt.grid(alpha=0.3)
-    plt.xticks(range(len(times[key])), labels=network_sizes)
-    plt.suptitle(f"Instantiation Times for Standard Linear Filters")
+    plt.xticks(range(len(network_sizes)), labels=network_sizes)
+    plt.suptitle("Instantiation Times for Standard Linear Filters")
     plt.show()
