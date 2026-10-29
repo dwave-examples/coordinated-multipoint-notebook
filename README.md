@@ -13,7 +13,7 @@ In one variation,
 neighboring cellular base stations jointly process received signals to reduce
 transmission-decoding errors.
 
-![Figure 1](_static/network_visual.jpg "Artistic rendition of a cellular network")
+![Illustration of a cellular network: two rows of five base-station towers connected to each other by orange dashed lines, with rows of cellphones above, between, and below them. White dashed lines link each cellphone to several nearby towers, showing that each transmission reaches multiple base stations.](static/network_visual.jpg "Artistic rendition of a cellular network")
 
 High-quality decoding techniques are computationally expensive, especially in
 dense urban areas, characterized by high noise (low signal-to-noise ratios, SNR)
@@ -76,11 +76,11 @@ number of transmitters, that minimizes the difference between the received
 signal and the sequence of symbols acted upon by the problem Hamiltonian,
 which represents the wireless channels of transmission. That is,
 
-![eq1](_static/eq_armin_y_minus_hv.png)
+![Equation 1: v-hat equals the argmin, over all symbol sequences v in the symbol alphabet O to the power N sub t, of the squared norm of y minus H v.](static/eq_armin_y_minus_hv.png)
 
 and the objective function is given by:
 
-![eq2](_static/eq_e_full.png)
+![Equation 2: E of v equals the sum over mu from 1 to N sub r of the quantity y sub mu minus the sum over i from 1 to N sub t of H sub i mu times v sub i, multiplied by the Hermitian transpose of that same quantity.](static/eq_e_full.png)
 
 with the external summation on the receivers (e.g., base stations), the internal
 summations on the transmitters (e.g., cellphones), and the Hermitian transpose
@@ -94,11 +94,11 @@ Ising model and you can see Ocean software's implementation in
 In brief, in the case of BPSK handled by this example, symbols are 1 or -1,
 and you can reduce the objective to,
 
-![eq3](_static/eq_e_quadratic.png)
+![Equation 3: E of v is proportional to minus the sum over i up to N sub t of 2 v sub i times the real part of the sum over mu of y sub mu dagger times H sub i mu, plus 2 times the sum over pairs i less than j of v sub i v sub j times the real part of the sum over mu of H sub i mu times H sub j mu dagger.](static/eq_e_quadratic.png)
 
 The Ising model's coefficients are then given by,
 
-![eq4](_static/eq_h_j.png)
+![Equation 4: the linear coefficient h sub i equals minus 2 times the sum over mu of y sub mu superscript Q times H sub i mu superscript Q plus y sub mu superscript I times H sub i mu superscript I. The quadratic coefficient J sub i j equals 2 times the sum over mu of H sub i mu superscript Q times H sub j mu superscript Q plus H sub i mu superscript I times H sub j mu superscript I.](static/eq_h_j.png)
 
 where superscript Q and I denote imaginary and real parts, respectively.
 

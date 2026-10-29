@@ -1,4 +1,4 @@
-# Copyright 2023 D-Wave Systems Inc.
+# Copyright 2023 D-Wave
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -12,32 +12,30 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-from colored import Fore, Style
+import time
 from typing import Union
 
-import numpy as np
-import time
 import dimod
+import numpy as np
+from colored import Fore, Style
 
-from helpers.network import configure_network, create_channels, _num_tx_rx
 from helpers.draw import draw_instantiation_times
+from helpers.network import _num_tx_rx, configure_network, create_channels
 
-ALL_METHODS = ['zero_forcing', 'matched_filter', 'MMSE']
+ALL_METHODS = ["zero_forcing", "matched_filter", "MMSE"]
 
-def create_filters(channels: np.ndarray, 
-                   methods: list = None, 
-                   snr_over_nt: float = float('inf')) -> dict:
+
+def create_filters(
+    channels: np.ndarray, methods: list = None, snr_over_nt: float = float("inf")
+) -> dict:
     """Instantiate linear filters.
 
     Args:
         channels: Transmission channels.
-
         methods: Types of filter. Supported values are:
-
             * 'matched_filter': Matched filter.
             * 'MMSE': Minimum mean square error filter.
             * 'zero_forcing': Zero forcing filter.
-
         snr_over_nt: Signal-to-noise ratio.
 
     Returns:
@@ -47,45 +45,51 @@ def create_filters(channels: np.ndarray,
         methods = ALL_METHODS
     elif unknown := set(methods).difference(ALL_METHODS):
         raise ValueError(f"filter {unknown} not supported")
-    
-    return {f'{method}': dimod.generators.wireless.linear_filter(
-        channels, method=method, SNRoverNt=snr_over_nt) for method in methods}
+
+    return {
+        f"{method}": dimod.generators.wireless.linear_filter(
+            channels, method=method, SNRoverNt=snr_over_nt
+        )
+        for method in methods
+    }
+
 
 def apply_filters(signal: np.ndarray, filters: dict) -> dict:
     """Decode a transmission with the given filters.
 
     Args:
         signal: Received sequence of symbols, possibly noisy.
-        
         filters: Linear filters used to decode the transmission.
 
     Returns:
         Dict of signals decoded with each of the given filters.
     """
-   
-    return {name: np.sign(np.real(np.matmul(filter, signal)))[:,0] for 
-        name, filter in filters.items()}
 
-def compare_signals(v: np.ndarray, 
-                    transmission: np.ndarray, 
-                    silence_printing: bool = False) -> Union[dict, float]:
+    return {
+        name: np.sign(np.real(np.matmul(filter, signal)))[:, 0] for name, filter in filters.items()
+    }
+
+
+def compare_signals(
+    v: np.ndarray, transmission: np.ndarray, silence_printing: bool = False
+) -> Union[dict, float]:
     """Compare two sequences of transmission symbols.
 
     Args:
         v: A sequence of transmission symbols.
-
         transmission: A sequence of transmission symbols.
-
         silence_printing: Boolean flag indicating whether to not print results.
 
     Returns:
-        Percentage of the sequence with identical symbols (returned if `silent_return=True`).  
+        Percentage of the sequence with identical symbols (returned if `silent_return=True`).
     """
     if isinstance(v, dict):
-        success_rate = {filter: sum(v[filter].flatten() == transmission.flatten()) 
-            for filter in v.keys()}
-        success_rate = {name: round(100*val/len(transmission)) for 
-            name, val in success_rate.items()}
+        success_rate = {
+            filter: sum(v[filter].flatten() == transmission.flatten()) for filter in v.keys()
+        }
+        success_rate = {
+            name: round(100 * val / len(transmission)) for name, val in success_rate.items()
+        }
 
         if not silence_printing:
             for name in success_rate.keys():
@@ -97,21 +101,20 @@ def compare_signals(v: np.ndarray,
             received = v.flatten()
         else:
             raise ValueError("Unknown signal type")
-        
-        success_rate = round(100*sum(received == transmission.flatten())/len(transmission))
+
+        success_rate = round(100 * sum(received == transmission.flatten()) / len(transmission))
         if not silence_printing:
             print(f"Decoded with a success rate of {success_rate}%.")
 
     return success_rate
-    
+
+
 def time_filter_instantiation(network_sizes: list, methods: list = None):
     """Measure the instantiation time of filters.
 
     Args:
         network_sizes: Sizes of the underlying lattice, :math:`3*(network_size - 1)`.
-
         methods: Types of filter. Supported values are:
-
             * 'matched_filter': Matched filter.
             * 'MMSE': Minimum mean square error filter.
             * 'zero_forcing': Zero forcing filter.
@@ -131,12 +134,14 @@ def time_filter_instantiation(network_sizes: list, methods: list = None):
         for method in methods:
             start_t = time.time_ns()
             create_filters(channels, methods=[method])
-            time_ms = (time.time_ns() - start_t)/1000000
+            time_ms = (time.time_ns() - start_t) / 1000000
             times[method].append(time_ms)
             if time_ms < 500:
                 print(f"\t* {method} took about {round(time_ms)} milliseconds.")
             else:
-                print(f"\t* {method} took about {Fore.red} {round(time_ms)}" +  
-                      f"{Style.reset}  milliseconds.")
+                print(
+                    f"\t* {method} took about {Fore.red}{round(time_ms)}"
+                    + f" milliseconds (slow).{Style.reset}"
+                )
 
     draw_instantiation_times(times, network_sizes)
