@@ -22,10 +22,10 @@ import numpy as np
 STYLES = {
     "QPU": {"color": "#0072B2", "marker": "*"},  # blue, star
     "zero_forcing": {"color": "#009E73", "marker": "^"},  # green, up triangle
-    "MMSE": {"color": "#CC79A7", "marker": "v"},  # pink, down triangle
+    "MMSE": {"color": "#56B4E9", "marker": "v"},  # sky blue, down triangle
     "matched_filter": {"color": "#E69F00", "marker": ">"},  # orange, right triangle
     "SA": {"color": "#D55E00", "marker": "x"},  # vermillion, cross
-    "greedy": {"color": "#56B4E9", "marker": "p"},  # sky blue, pentagon
+    "greedy": {"color": "#CC79A7", "marker": "p"},  # pink, pentagon
     "tabu": {"color": "#000000", "marker": "D"},  # black, diamond
 }
 
